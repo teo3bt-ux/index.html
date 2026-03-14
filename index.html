@@ -44,18 +44,17 @@
 
         .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; }
 
-        .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-top: 10px; }
+        .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 10px; text-transform: uppercase; }
         td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; }
-        .col-day { text-align: left; padding-left: 12px; color: var(--ios-secondary-text); }
+        .col-left { text-align: left; padding-left: 12px; color: var(--ios-secondary-text); }
         .dot { font-size: 18px; color: var(--ios-text); }
         .row-total { background: #2C2C2E; font-weight: 700; }
 
         .hidden { display: none !important; }
-        .filter-group { display: flex; gap: 8px; align-items: center; }
-        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin-left: 16px; }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px; }
+        .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 20px 0 8px 16px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -86,16 +85,18 @@
                 </div>
             </div>
         </div>
-        <button class="btn-main" onclick="salva()">Salva</button>
+        <button class="btn-main" onclick="salva()">Salva Sessione</button>
     </div>
 
     <div id="view-stats" class="hidden">
         <div class="filter-row">
-            <span class="section-title" style="margin:0">Filtra</span>
-            <div class="filter-group">
-                <select id="year-filter" onchange="renderTable()" style="color:var(--ios-blue); font-weight:600;"></select>
-                <select id="week-filter" onchange="renderTable()" style="color:var(--ios-blue); font-weight:600;"></select>
-            </div>
+            <label class="section-title" style="margin:0">Seleziona Anno</label>
+            <select id="year-filter" onchange="aggiornaTutto()" style="color:var(--ios-blue); font-weight:700; font-size: 17px;"></select>
+        </div>
+
+        <div class="section-title">Dettaglio Settimana</div>
+        <div class="filter-row" style="justify-content: flex-start; gap: 15px;">
+            <select id="week-filter" onchange="renderSettimanale()" style="color:var(--ios-blue); font-weight:600;"></select>
         </div>
         <div class="table-container">
             <table>
@@ -106,10 +107,20 @@
                 <tfoot id="log-foot"></tfoot>
             </table>
         </div>
+
+        <div class="section-title">Riepilogo Annuale</div>
+        <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+            <table>
+                <thead style="position: sticky; top: 0; z-index: 10;">
+                    <tr><th style="text-align:left;padding-left:12px;">Settimana</th><th>Tot KM</th><th>Tot D+</th></tr>
+                </thead>
+                <tbody id="year-summary-body"></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'fitness_v10';
+        const STORAGE_KEY = 'fitness_v11';
 
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -133,7 +144,7 @@
         }
         for(let i=1; i<=53; i++) {
             let sel = i === getWeekNumber(oggi) ? "selected" : "";
-            wFilter.innerHTML += `<option value="${i}" ${sel}>Sett ${i}</option>`;
+            wFilter.innerHTML += `<option value="${i}" ${sel}>Settimana ${i}</option>`;
         }
 
         function toggleCorsa() {
@@ -151,19 +162,19 @@
             document.getElementById('view-input').classList.toggle('hidden', tab !== 'input');
             document.getElementById('view-stats').classList.toggle('hidden', tab !== 'stats');
             document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i===0 && tab==='input') || (i===1 && tab==='stats')));
-            if(tab === 'stats') renderTable();
+            if(tab === 'stats') aggiornaTutto();
         }
 
         function salva() {
             const dataVal = document.getElementById('data_rif').value;
             let db = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-            
             const existingIdx = db.findIndex(r => r.data === dataVal);
             if(existingIdx !== -1) {
                 if(!confirm("Dati già presenti per questa data. Vuoi sovrascriverli?")) return;
                 db.splice(existingIdx, 1);
             }
 
+            const dObj = new Date(dataVal);
             const entry = {
                 data: dataVal,
                 pal: document.getElementById('palestra').value,
@@ -171,19 +182,23 @@
                 tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
                 km: parseFloat(document.getElementById('km_percorsi').value || 0),
                 dplus: parseInt(document.getElementById('d_plus').value || 0),
-                year: new Date(dataVal).getFullYear(),
-                week: getWeekNumber(new Date(dataVal))
+                year: dObj.getFullYear(),
+                week: getWeekNumber(dObj)
             };
-            
             db.push(entry);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
             
             const b = document.querySelector('.btn-main');
             b.innerText = "✓ Salvato"; b.style.background = "#30D158";
-            setTimeout(() => { b.innerText = "Salva"; b.style.background = "var(--ios-blue)"; }, 1500);
+            setTimeout(() => { b.innerText = "Salva Sessione"; b.style.background = "var(--ios-blue)"; }, 1500);
         }
 
-        function renderTable() {
+        function aggiornaTutto() {
+            renderSettimanale();
+            renderAnnuale();
+        }
+
+        function renderSettimanale() {
             const targetY = parseInt(document.getElementById('year-filter').value);
             const targetW = parseInt(document.getElementById('week-filter').value);
             const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
@@ -192,7 +207,6 @@
             tbody.innerHTML = "";
             let totKM = 0, totD = 0;
 
-            // Trova il lunedì della settimana target
             let d = new Date(targetY, 0, 1);
             let dayNum = d.getDay() || 7;
             d.setDate(d.getDate() + (targetW - 1) * 7 - (dayNum - 1));
@@ -203,9 +217,8 @@
                 const iso = c.toISOString().split('T')[0];
                 const r = db.find(rec => rec.data === iso);
                 if(r) { totKM += r.km; totD += r.dplus; }
-
                 tbody.innerHTML += `<tr>
-                    <td class="col-day"><strong>${giorni[i]}</strong> ${c.getDate()}/${c.getMonth()+1}</td>
+                    <td class="col-left"><strong>${giorni[i]}</strong> ${c.getDate()}/${c.getMonth()+1}</td>
                     <td class="dot">${r?.pal === "SI" ? "●" : ""}</td>
                     <td class="dot">${r?.tipo === "Lento" ? "●" : ""}</td>
                     <td class="dot">${r?.tipo === "Reps" ? "●" : ""}</td>
@@ -213,7 +226,34 @@
                     <td style="color:var(--ios-blue)">${r?.dplus > 0 ? r.dplus : ""}</td>
                 </tr>`;
             }
-            tfoot.innerHTML = `<tr class="row-total"><td class="col-day">TOTALE</td><td></td><td></td><td></td><td>${totKM.toFixed(1)}</td><td>${totD}</td></tr>`;
+            tfoot.innerHTML = `<tr class="row-total"><td class="col-left">TOTALE</td><td></td><td></td><td></td><td>${totKM.toFixed(1)}</td><td>${totD}</td></tr>`;
+        }
+
+        function renderAnnuale() {
+            const targetY = parseInt(document.getElementById('year-filter').value);
+            const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            const tbody = document.getElementById('year-summary-body');
+            tbody.innerHTML = "";
+
+            for (let w = 1; w <= 53; w++) {
+                const dataSettimana = db.filter(r => r.year === targetY && r.week === w);
+                const kmSett = dataSettimana.reduce((acc, curr) => acc + curr.km, 0);
+                const dSett = dataSettimana.reduce((acc, curr) => acc + curr.dplus, 0);
+
+                if(kmSett > 0 || dSett > 0) {
+                    tbody.innerHTML += `<tr>
+                        <td class="col-left">Settimana ${w}</td>
+                        <td style="color:var(--ios-blue); font-weight:600;">${kmSett.toFixed(1)} km</td>
+                        <td style="color:var(--ios-blue); font-weight:600;">${dSett} m</td>
+                    </tr>`;
+                } else {
+                    tbody.innerHTML += `<tr>
+                        <td class="col-left">Settimana ${w}</td>
+                        <td style="color:var(--ios-secondary-text)">0</td>
+                        <td style="color:var(--ios-secondary-text)">0</td>
+                    </tr>`;
+                }
+            }
         }
     </script>
 </body>
