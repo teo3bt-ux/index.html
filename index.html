@@ -14,6 +14,7 @@
             --ios-text: #FFFFFF;
             --ios-secondary-text: #8E8E93;
             --ios-border: #38383A;
+            --ios-green: #30D158;
         }
 
         body {
@@ -22,7 +23,7 @@
             color: var(--ios-text);
             padding: 20px;
             margin: 0;
-            padding-top: env(safe-area-inset-top);
+            padding-top: calc(env(safe-area-inset-top) + 10px);
             -webkit-font-smoothing: antialiased;
         }
 
@@ -31,12 +32,12 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .header h1 { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
-        .header-info { text-align: right; margin-top: 5px; }
-        .date-full { font-size: 15px; color: var(--ios-text); text-transform: capitalize; display: block; font-weight: 500; }
-        .week-num { font-size: 13px; color: var(--ios-secondary-text); }
+        .header-info { text-align: right; }
+        .date-full { font-size: 15px; color: var(--ios-blue); text-transform: capitalize; display: block; font-weight: 600; }
+        .week-num { font-size: 12px; color: var(--ios-secondary-text); font-weight: 400; }
 
         /* NAV TABS */
         .nav-tabs {
@@ -48,26 +49,22 @@
         }
         .tab {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             border-radius: 8px;
             color: var(--ios-secondary-text);
-            transition: all 0.2s;
         }
-        .tab.active {
-            background: #3A3A3C;
-            color: white;
-        }
+        .tab.active { background: #3A3A3C; color: white; }
 
-        /* CARDS & INPUTS */
+        /* CARDS */
         .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
         .input-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 48px;
+            min-height: 50px;
             border-bottom: 0.5px solid var(--ios-border);
         }
         .input-row:last-child { border-bottom: none; }
@@ -80,6 +77,7 @@
             text-align: right;
             outline: none;
             font-family: inherit;
+            min-width: 100px;
         }
 
         .btn-main {
@@ -91,22 +89,20 @@
             font-weight: 600;
             border: none;
             width: 100%;
-            -webkit-tap-highlight-color: transparent;
         }
-        .btn-main:active { opacity: 0.8; }
 
-        /* TABELLA STORICO */
-        .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
-        th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); }
+        /* TABLE */
+        .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 10px; text-transform: uppercase; text-align: center; }
+        td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; }
         .col-day { text-align: left; padding-left: 12px; color: var(--ios-secondary-text); }
         .dot { font-size: 18px; color: var(--ios-text); }
+        .row-total { background: #2C2C2E; font-weight: 700; color: var(--ios-text); }
 
-        .hidden { display: none; }
-        .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 0 0 8px 16px; font-weight: 500; }
-
-        .filter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 0 10px; }
+        .hidden { display: none !important; }
+        .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 0 0 8px 16px; }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -114,8 +110,8 @@
     <div class="header">
         <h1>Matteo</h1>
         <div class="header-info">
-            <span id="date-full" class="date-full"></span>
-            <span id="week-num" class="week-num"></span>
+            <span id="date-full" class="date-full">-- --</span>
+            <span id="week-num" class="week-num">Settimana --</span>
         </div>
     </div>
 
@@ -125,21 +121,150 @@
     </div>
 
     <div id="view-input">
-        <div class="section-title">Nuovo Allenamento</div>
+        <div class="section-title">Allenamento</div>
         <div class="card">
             <div class="input-row"><label>Data</label><input type="date" id="data_rif"></div>
             <div class="input-row"><label>Palestra</label><select id="palestra"><option value="NO">No</option><option value="SI">Sì</option></select></div>
-            <div class="input-row"><label>Corsa</label><select id="corsa" onchange="aggiornaCampi()"><option value="NO">No</option><option value="SI">Sì</option></select></div>
-            <div id="extra-corsa" class="hidden">
-                <div class="input-row"><label>Tipo</label><select id="tipo_corsa" onchange="aggiornaCampi()"><option value="" disabled selected>Scegli...</option><option value="Lento">Lento</option><option value="Reps">Reps</option></select></div>
-                <div id="dati-corsa" class="hidden">
+            <div class="input-row">
+                <label>Corsa</label>
+                <select id="corsa" onchange="toggleCorsa()">
+                    <option value="NO">No</option>
+                    <option value="SI">Sì</option>
+                </select>
+            </div>
+            
+            <div id="corsa-flow" class="hidden">
+                <div class="input-row">
+                    <label>Tipo</label>
+                    <select id="tipo_corsa" onchange="toggleKM()">
+                        <option value="" selected disabled>Scegli...</option>
+                        <option value="Lento">Lento</option>
+                        <option value="Reps">Reps</option>
+                    </select>
+                </div>
+                <div id="corsa-dati" class="hidden">
                     <div class="input-row"><label>KM</label><input type="number" id="km_percorsi" step="0.01" inputmode="decimal" placeholder="0.00"></div>
                     <div class="input-row"><label>D+ (m)</label><input type="number" id="d_plus" inputmode="numeric" placeholder="0"></div>
                 </div>
             </div>
         </div>
-        <button class="btn-main" onclick="salva()">Salva Sessione</button>
+        <button class="btn-main" onclick="salva()">Salva</button>
     </div>
 
     <div id="view-stats" class="hidden">
         <div class="filter-row">
+            <span class="section-title" style="margin:0">Riepilogo</span>
+            <select id="week-filter" onchange="renderTable()" style="color:var(--ios-blue); font-weight:600;"></select>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th>KM</th><th>D+</th></tr>
+                </thead>
+                <tbody id="log-body"></tbody>
+                <tfoot id="log-foot"></tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+        }
+
+        // Setup Iniziale
+        const oggi = new Date();
+        document.getElementById('data_rif').valueAsDate = oggi;
+        document.getElementById('date-full').innerText = oggi.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
+        document.getElementById('week-num').innerText = "Settimana " + getWeekNumber(oggi);
+
+        const weekFilter = document.getElementById('week-filter');
+        for(let i=0; i<12; i++) {
+            let w = getWeekNumber(oggi) - i;
+            if(w > 0) {
+                let opt = document.createElement('option');
+                opt.value = w; opt.innerText = "Settimana " + w;
+                weekFilter.appendChild(opt);
+            }
+        }
+
+        function toggleCorsa() {
+            const val = document.getElementById('corsa').value;
+            document.getElementById('corsa-flow').classList.toggle('hidden', val === 'NO');
+            toggleKM();
+        }
+
+        function toggleKM() {
+            const tipo = document.getElementById('tipo_corsa').value;
+            const corsa = document.getElementById('corsa').value;
+            document.getElementById('corsa-dati').classList.toggle('hidden', corsa === 'NO' || tipo === "");
+        }
+
+        function switchTab(tab) {
+            document.getElementById('view-input').classList.toggle('hidden', tab !== 'input');
+            document.getElementById('view-stats').classList.toggle('hidden', tab !== 'stats');
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i===0 && tab==='input') || (i===1 && tab==='stats')));
+            if(tab === 'stats') renderTable();
+        }
+
+        function salva() {
+            const dataVal = document.getElementById('data_rif').value;
+            const entry = {
+                data: dataVal,
+                pal: document.getElementById('palestra').value,
+                cor: document.getElementById('corsa').value,
+                tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
+                km: parseFloat(document.getElementById('km_percorsi').value || 0),
+                dplus: parseInt(document.getElementById('d_plus').value || 0),
+                week: getWeekNumber(new Date(dataVal))
+            };
+            let db = JSON.parse(localStorage.getItem('fitness_v9') || "[]");
+            db.push(entry);
+            localStorage.setItem('fitness_v9', JSON.stringify(db));
+            
+            const b = document.querySelector('.btn-main');
+            b.innerText = "✓ Salvato"; b.style.background = "#30D158";
+            setTimeout(() => { b.innerText = "Salva"; b.style.background = "var(--ios-blue)"; }, 1500);
+        }
+
+        function renderTable() {
+            const targetWeek = parseInt(document.getElementById('week-filter').value);
+            const db = JSON.parse(localStorage.getItem('fitness_v9') || "[]");
+            const tbody = document.getElementById('log-body');
+            const tfoot = document.getElementById('log-foot');
+            tbody.innerHTML = "";
+            
+            let totKM = 0, totD = 0;
+
+            const jan1 = new Date(new Date().getFullYear(), 0, 1);
+            const startOfWeek = new Date(jan1.setDate(jan1.getDate() + (targetWeek - 1) * 7));
+            startOfWeek.setDate(startOfWeek.getDate() + (startOfWeek.getDay() === 0 ? -6 : 1 - startOfWeek.getDay()));
+
+            const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+            for (let i = 0; i < 7; i++) {
+                let c = new Date(startOfWeek); c.setDate(startOfWeek.getDate() + i);
+                const iso = c.toISOString().split('T')[0];
+                const r = db.find(rec => rec.data === iso);
+
+                if(r) { totKM += r.km; totD += r.dplus; }
+
+                tbody.innerHTML += `<tr>
+                    <td class="col-day"><strong>${giorni[i]}</strong> ${c.getDate()}/${c.getMonth()+1}</td>
+                    <td class="dot">${r?.pal === "SI" ? "●" : ""}</td>
+                    <td class="dot">${r?.tipo === "Lento" ? "●" : ""}</td>
+                    <td class="dot">${r?.tipo === "Reps" ? "●" : ""}</td>
+                    <td style="color:var(--ios-blue)">${r?.km > 0 ? r.km.toFixed(1) : ""}</td>
+                    <td style="color:var(--ios-blue)">${r?.dplus > 0 ? r.dplus : ""}</td>
+                </tr>`;
+            }
+            tfoot.innerHTML = `<tr class="row-total">
+                <td class="col-day">TOTALE</td><td></td><td></td><td></td>
+                <td>${totKM.toFixed(1)}</td><td>${totD}</td>
+            </tr>`;
+        }
+    </script>
+</body>
+</html>
