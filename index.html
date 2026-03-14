@@ -14,6 +14,8 @@
             --ios-text: #FFFFFF;
             --ios-secondary-text: #8E8E93;
             --ios-border: #38383A;
+            --ios-green-soft: rgba(48, 209, 88, 0.15); /* Verde tenue per weekend */
+            --ios-yellow-soft: rgba(255, 214, 10, 0.2); /* Giallo ocra tenue per KM/D+ */
         }
 
         body {
@@ -26,34 +28,38 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
         .header h1 { font-size: 34px; font-weight: 700; margin: 0; }
         .header-info { text-align: right; }
         .date-full { font-size: 15px; color: var(--ios-blue); text-transform: capitalize; display: block; font-weight: 600; }
         .week-num { font-size: 12px; color: var(--ios-secondary-text); }
 
+        /* TABS */
         .nav-tabs { display: flex; background: #1C1C1E; padding: 2px; border-radius: 10px; margin-bottom: 25px; }
-        .tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: 600; border-radius: 8px; color: var(--ios-secondary-text); }
+        .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; border-radius: 8px; color: var(--ios-secondary-text); }
         .tab.active { background: #3A3A3C; color: white; }
 
-        .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
-        .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
-        .input-row:last-child { border-bottom: none; }
-        label { font-size: 17px; }
-        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; font-family: inherit; }
-
-        .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; }
-
+        /* TABLES */
         .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 10px; text-transform: uppercase; }
         td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; }
-        .col-left { text-align: left; padding-left: 12px; color: var(--ios-secondary-text); }
-        .dot { font-size: 18px; color: var(--ios-text); }
-        .row-total { background: #2C2C2E; font-weight: 700; }
+        
+        /* COLORI SPECIALI */
+        .weekend-row { background-color: var(--ios-green-soft) !important; }
+        .col-stats { background-color: var(--ios-yellow-soft); font-weight: 600; color: #FFD60A; }
+        .col-left { text-align: left; padding-left: 12px; }
+        
+        /* UI ELEMENTS */
+        .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
+        .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
+        .input-row:last-child { border-bottom: none; }
+        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; }
+        .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; }
+        .btn-prog { background: #2C2C2E; color: var(--ios-blue); border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; }
 
         .hidden { display: none !important; }
-        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px; }
         .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 20px 0 8px 16px; font-weight: 600; }
     </style>
 </head>
@@ -69,6 +75,7 @@
 
     <div class="nav-tabs">
         <div class="tab active" onclick="switchTab('input')">Registra</div>
+        <div class="tab" onclick="switchTab('plan')">Programma</div>
         <div class="tab" onclick="switchTab('stats')">Storico</div>
     </div>
 
@@ -80,47 +87,45 @@
             <div id="corsa-flow" class="hidden">
                 <div class="input-row"><label>Tipo</label><select id="tipo_corsa" onchange="toggleKM()"><option value="" selected disabled>Scegli...</option><option value="Lento">Lento</option><option value="Reps">Reps</option></select></div>
                 <div id="corsa-dati" class="hidden">
-                    <div class="input-row"><label>KM</label><input type="number" id="km_percorsi" step="0.01" inputmode="decimal" placeholder="0.00"></div>
-                    <div class="input-row"><label>D+ (m)</label><input type="number" id="d_plus" inputmode="numeric" placeholder="0"></div>
+                    <div class="input-row"><label>KM</label><input type="number" id="km_percorsi" step="0.01" inputmode="decimal"></div>
+                    <div class="input-row"><label>D+ (m)</label><input type="number" id="d_plus" inputmode="numeric"></div>
                 </div>
             </div>
         </div>
         <button class="btn-main" onclick="salva()">Salva Sessione</button>
     </div>
 
-    <div id="view-stats" class="hidden">
-        <div class="filter-row">
-            <label class="section-title" style="margin:0">Seleziona Anno</label>
-            <select id="year-filter" onchange="aggiornaTutto()" style="color:var(--ios-blue); font-weight:700; font-size: 17px;"></select>
-        </div>
+    <div id="view-plan" class="hidden">
+        <div id="plan-container"></div>
+    </div>
 
-        <div class="section-title">Dettaglio Settimana</div>
-        <div class="filter-row" style="justify-content: flex-start; gap: 15px;">
-            <select id="week-filter" onchange="renderSettimanale()" style="color:var(--ios-blue); font-weight:600;"></select>
+    <div id="view-stats" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:0 10px;">
+            <span class="section-title" style="margin:0">Filtri Anno/Sett</span>
+            <div style="display:flex; gap:10px;">
+                <select id="year-filter" onchange="aggiornaTutto()" style="color:var(--ios-blue); font-weight:700;"></select>
+                <select id="week-filter" onchange="renderSettimanale()" style="color:var(--ios-blue); font-weight:700;"></select>
+            </div>
         </div>
+        
+        <div class="section-title">Log Settimanale</div>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th>KM</th><th>D+</th></tr>
-                </thead>
+                <thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead>
                 <tbody id="log-body"></tbody>
                 <tfoot id="log-foot"></tfoot>
             </table>
         </div>
 
         <div class="section-title">Riepilogo Annuale</div>
-        <div class="table-container" style="max-height: 300px; overflow-y: auto;">
-            <table>
-                <thead style="position: sticky; top: 0; z-index: 10;">
-                    <tr><th style="text-align:left;padding-left:12px;">Settimana</th><th>Tot KM</th><th>Tot D+</th></tr>
-                </thead>
-                <tbody id="year-summary-body"></tbody>
-            </table>
+        <div class="table-container" style="max-height: 250px; overflow-y: auto;">
+            <table><tbody id="year-summary-body"></tbody></table>
         </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'fitness_v11';
+        const DB_KEY = 'fitness_v14';
+        const PLAN_KEY = 'plan_v14';
 
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -129,53 +134,45 @@
             return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
         }
 
-        // Init
         const oggi = new Date();
         document.getElementById('data_rif').valueAsDate = oggi;
         document.getElementById('date-full').innerText = oggi.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
         document.getElementById('week-num').innerText = "Settimana " + getWeekNumber(oggi);
 
-        // Popola Filtri
         const yFilter = document.getElementById('year-filter');
         const wFilter = document.getElementById('week-filter');
-        for(let i=0; i<3; i++) {
-            let y = oggi.getFullYear() - i;
-            yFilter.innerHTML += `<option value="${y}">${y}</option>`;
-        }
-        for(let i=1; i<=53; i++) {
-            let sel = i === getWeekNumber(oggi) ? "selected" : "";
-            wFilter.innerHTML += `<option value="${i}" ${sel}>Settimana ${i}</option>`;
-        }
+        for(let i=0; i<3; i++) yFilter.innerHTML += `<option value="${oggi.getFullYear()-i}">${oggi.getFullYear()-i}</option>`;
+        for(let i=1; i<=53; i++) wFilter.innerHTML += `<option value="${i}" ${i===getWeekNumber(oggi)?'selected':''}>W${i}</option>`;
 
         function toggleCorsa() {
             document.getElementById('corsa-flow').classList.toggle('hidden', document.getElementById('corsa').value === 'NO');
             toggleKM();
         }
-
         function toggleKM() {
-            const tipo = document.getElementById('tipo_corsa').value;
-            const corsa = document.getElementById('corsa').value;
-            document.getElementById('corsa-dati').classList.toggle('hidden', corsa === 'NO' || tipo === "");
+            document.getElementById('corsa-dati').classList.toggle('hidden', document.getElementById('corsa').value === 'NO' || document.getElementById('tipo_corsa').value === "");
         }
 
         function switchTab(tab) {
             document.getElementById('view-input').classList.toggle('hidden', tab !== 'input');
+            document.getElementById('view-plan').classList.toggle('hidden', tab !== 'plan');
             document.getElementById('view-stats').classList.toggle('hidden', tab !== 'stats');
-            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i===0 && tab==='input') || (i===1 && tab==='stats')));
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                const labels = ['reg', 'pla', 'sta'];
+                t.classList.toggle('active', labels[i] === tab.substring(0,3));
+            });
             if(tab === 'stats') aggiornaTutto();
+            if(tab === 'plan') renderProgramma();
         }
 
         function salva() {
             const dataVal = document.getElementById('data_rif').value;
-            let db = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-            const existingIdx = db.findIndex(r => r.data === dataVal);
-            if(existingIdx !== -1) {
-                if(!confirm("Dati già presenti per questa data. Vuoi sovrascriverli?")) return;
-                db.splice(existingIdx, 1);
-            }
+            let db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+            const idx = db.findIndex(r => r.data === dataVal);
+            if(idx !== -1 && !confirm("Sovrascrivere dati esistenti?")) return;
+            if(idx !== -1) db.splice(idx, 1);
 
             const dObj = new Date(dataVal);
-            const entry = {
+            db.push({
                 data: dataVal,
                 pal: document.getElementById('palestra').value,
                 cor: document.getElementById('corsa').value,
@@ -184,73 +181,106 @@
                 dplus: parseInt(document.getElementById('d_plus').value || 0),
                 year: dObj.getFullYear(),
                 week: getWeekNumber(dObj)
-            };
-            db.push(entry);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            });
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            alert("Salvato correttamente!");
+        }
+
+        function renderProgramma() {
+            const container = document.getElementById('plan-container');
+            container.innerHTML = "";
+            const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+            const plan = JSON.parse(localStorage.getItem(PLAN_KEY) || "{}");
             
-            const b = document.querySelector('.btn-main');
-            b.innerText = "✓ Salvato"; b.style.background = "#30D158";
-            setTimeout(() => { b.innerText = "Salva Sessione"; b.style.background = "var(--ios-blue)"; }, 1500);
+            for(let wOffset = -1; wOffset <= 3; wOffset++) {
+                let d = new Date();
+                let dayNum = d.getDay() || 7;
+                d.setDate(d.getDate() - (dayNum - 1) + (wOffset * 7));
+                
+                let html = `<div class="section-title">${wOffset === 0 ? 'In corso' : (wOffset === -1 ? 'Scorsa' : 'Tra ' + wOffset + ' sett')} (W${getWeekNumber(d)})</div>`;
+                html += `<div class="table-container"><table>`;
+                
+                const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+                for(let i=0; i<7; i++) {
+                    let c = new Date(d); c.setDate(d.getDate() + i);
+                    const iso = c.toISOString().split('T')[0];
+                    const isWeekend = (i >= 5);
+                    const r = db.find(rec => rec.data === iso);
+                    const p = plan[iso];
+
+                    html += `<tr class="${isWeekend ? 'weekend-row' : ''}">
+                        <td class="col-left"><strong>${giorni[i]}</strong> ${c.getDate()}/${c.getMonth()+1}</td>
+                        <td style="text-align:right; padding-right:12px;">
+                            ${r ? `<span style="color:#30D158">● ${r.pal==='SI'?'Pal':''} ${r.tipo!=='-'?r.tipo:''}</span>` : 
+                             (wOffset >= 0 ? `<button class="btn-prog" onclick="addPlan('${iso}')">${p ? p : '+ Programma'}</button>` : '')}
+                        </td>
+                    </tr>`;
+                }
+                html += `</table></div>`;
+                container.innerHTML += html;
+            }
         }
 
-        function aggiornaTutto() {
-            renderSettimanale();
-            renderAnnuale();
+        function addPlan(iso) {
+            const val = prompt("Programma:");
+            if (val === null) return;
+            let plan = JSON.parse(localStorage.getItem(PLAN_KEY) || "{}");
+            if (val === "") delete plan[iso]; else plan[iso] = val;
+            localStorage.setItem(PLAN_KEY, JSON.stringify(plan));
+            renderProgramma();
         }
 
+        function aggiornaTutto() { renderSettimanale(); renderAnnuale(); }
+        
         function renderSettimanale() {
             const targetY = parseInt(document.getElementById('year-filter').value);
             const targetW = parseInt(document.getElementById('week-filter').value);
-            const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             const tbody = document.getElementById('log-body');
-            const tfoot = document.getElementById('log-foot');
             tbody.innerHTML = "";
-            let totKM = 0, totD = 0;
-
+            let tk=0, td=0;
             let d = new Date(targetY, 0, 1);
             let dayNum = d.getDay() || 7;
             d.setDate(d.getDate() + (targetW - 1) * 7 - (dayNum - 1));
 
-            const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
             for (let i = 0; i < 7; i++) {
                 let c = new Date(d); c.setDate(d.getDate() + i);
                 const iso = c.toISOString().split('T')[0];
+                const isWeekend = (i >= 5);
                 const r = db.find(rec => rec.data === iso);
-                if(r) { totKM += r.km; totD += r.dplus; }
-                tbody.innerHTML += `<tr>
-                    <td class="col-left"><strong>${giorni[i]}</strong> ${c.getDate()}/${c.getMonth()+1}</td>
-                    <td class="dot">${r?.pal === "SI" ? "●" : ""}</td>
-                    <td class="dot">${r?.tipo === "Lento" ? "●" : ""}</td>
-                    <td class="dot">${r?.tipo === "Reps" ? "●" : ""}</td>
-                    <td style="color:var(--ios-blue)">${r?.km > 0 ? r.km.toFixed(1) : ""}</td>
-                    <td style="color:var(--ios-blue)">${r?.dplus > 0 ? r.dplus : ""}</td>
-                </tr>`;
+                if(r){ tk+=r.km; td+=r.dplus; }
+                tbody.innerHTML += `
+                    <tr class="${isWeekend ? 'weekend-row' : ''}">
+                        <td class="col-left"><strong>${c.getDate()}/${c.getMonth()+1}</strong></td>
+                        <td class="dot">${r?.pal==='SI'?'●':''}</td>
+                        <td class="dot">${r?.tipo==='Lento'?'●':''}</td>
+                        <td class="dot">${r?.tipo==='Reps'?'●':''}</td>
+                        <td class="col-stats">${r?.km||''}</td>
+                        <td class="col-stats">${r?.dplus||''}</td>
+                    </tr>`;
             }
-            tfoot.innerHTML = `<tr class="row-total"><td class="col-left">TOTALE</td><td></td><td></td><td></td><td>${totKM.toFixed(1)}</td><td>${totD}</td></tr>`;
+            document.getElementById('log-foot').innerHTML = `
+                <tr class="row-total">
+                    <td class="col-left">TOTALI</td><td></td><td></td><td></td>
+                    <td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td>
+                    <td class="col-stats" style="background:#FFD60A; color:black;">${td}</td>
+                </tr>`;
         }
 
         function renderAnnuale() {
             const targetY = parseInt(document.getElementById('year-filter').value);
-            const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             const tbody = document.getElementById('year-summary-body');
             tbody.innerHTML = "";
-
-            for (let w = 1; w <= 53; w++) {
-                const dataSettimana = db.filter(r => r.year === targetY && r.week === w);
-                const kmSett = dataSettimana.reduce((acc, curr) => acc + curr.km, 0);
-                const dSett = dataSettimana.reduce((acc, curr) => acc + curr.dplus, 0);
-
-                if(kmSett > 0 || dSett > 0) {
+            for (let w = 53; w >= 1; w--) {
+                const data = db.filter(r => r.year === targetY && r.week === w);
+                const k = data.reduce((a, c) => a + c.km, 0);
+                const d = data.reduce((a, c) => a + c.dplus, 0);
+                if(k>0 || d>0) {
                     tbody.innerHTML += `<tr>
                         <td class="col-left">Settimana ${w}</td>
-                        <td style="color:var(--ios-blue); font-weight:600;">${kmSett.toFixed(1)} km</td>
-                        <td style="color:var(--ios-blue); font-weight:600;">${dSett} m</td>
-                    </tr>`;
-                } else {
-                    tbody.innerHTML += `<tr>
-                        <td class="col-left">Settimana ${w}</td>
-                        <td style="color:var(--ios-secondary-text)">0</td>
-                        <td style="color:var(--ios-secondary-text)">0</td>
+                        <td class="col-stats" style="width:25%">${k.toFixed(1)} km</td>
+                        <td class="col-stats" style="width:25%">${d} m</td>
                     </tr>`;
                 }
             }
