@@ -1,0 +1,159 @@
+index.html  
+<!DOCTYPE html>  
+<html lang="it">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+    <title>Fitness Tracker Pro</title>  
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  
+    <style>  
+        :root { --ios-blue: #007aff; --ios-bg: #f2f2f7; --ios-card: #ffffff; }  
+        body { font-family: -apple-system, sans-serif; background-color: var(--ios-bg); padding: 20px; margin: 0; color: #1c1c1e; }  
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 20px; }  
+        .card { background: var(--ios-card); border-radius: 12px; padding: 16px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }  
+        .input-group { margin-bottom: 15px; border-bottom: 0.5px solid #e5e5ea; padding-bottom: 10px; }  
+        .input-group:last-child { border-bottom: none; }  
+        label { font-size: 13px; color: #8e8e93; display: block; margin-bottom: 5px; text-transform: uppercase; font-weight: 600; }  
+        input, select { width: 100%; padding: 12px; border: none; font-size: 17px; box-sizing: border-box; background: transparent; color: var(--ios-blue); text-align: right; outline: none; }  
+        .flex-row { display: flex; justify-content: space-between; align-items: center; }  
+        .hidden { display: none; }  
+        .btn { display: block; width: 100%; padding: 16px; border-radius: 12px; font-size: 17px; font-weight: 600; border: none; cursor: pointer; text-align: center; }  
+        .btn-primary { background: var(--ios-blue); color: white; margin-top: 20px; }  
+        .btn-sec { background: #ffffff; color: var(--ios-blue); margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }  
+    </style>  
+</head>  
+<body>  
+  
+    <h1>Tracker Attività</h1>  
+  
+    <div class="card">  
+        <div class="input-group flex-row">  
+            <label>Data</label>  
+            <input type="date" id="data_rif">  
+        </div>  
+  
+        <div class="input-group flex-row">  
+            <label>Palestra</label>  
+            <select id="palestra">  
+                <option value="NO">No</option>  
+                <option value="SI">Sì</option>  
+            </select>  
+        </div>  
+  
+        <div class="input-group flex-row">  
+            <label>Corsa</label>  
+            <select id="corsa" onchange="aggiornaFlusso()">  
+                <option value="NO">No</option>  
+                <option value="SI">Sì</option>  
+            </select>  
+        </div>  
+  
+        <div id="sezione-extra-corsa" class="hidden">  
+            <div class="input-group flex-row">  
+                <label>Tipo di Corsa</label>  
+                <select id="tipo_corsa" onchange="aggiornaFlusso()">  
+                    <option value="" disabled selected>Scegli...</option>  
+                    <option value="Lento">Lento</option>  
+                    <option value="Reps">Reps</option>  
+                </select>  
+            </div>  
+  
+            <div id="sezione-dati-corsa" class="hidden">  
+                <div class="input-group flex-row">  
+                    <label>KM Percorsi</label>  
+                    <input type="number" id="km_percorsi" step="0.01" inputmode="decimal" placeholder="0.00">  
+                </div>  
+                <div class="input-group flex-row">  
+                    <label>D+ (Metri)</label>  
+                    <input type="number" id="d_plus" inputmode="numeric" placeholder="0">  
+                </div>  
+            </div>  
+        </div>  
+  
+        <button class="btn btn-primary" onclick="salvaDati()">Salva Sessione</button>  
+    </div>  
+  
+    <div class="card">  
+        <label>Ultimi 7 Allenamenti (KM)</label>  
+        <canvas id="graficoKM"></canvas>  
+    </div>  
+  
+    <button class="btn btn-sec" onclick="esportaExcel()">Esporta Excel (CSV)</button>  
+  
+    <script>  
+        document.getElementById('data_rif').valueAsDate = new Date();  
+        let myChart;  
+  
+        function aggiornaFlusso() {  
+            const corsa = document.getElementById('corsa').value;  
+            const tipo = document.getElementById('tipo_corsa').value;  
+            document.getElementById('sezione-extra-corsa').className = (corsa === "SI") ? "" : "hidden";  
+            document.getElementById('sezione-dati-corsa').className = (corsa === "SI" && tipo !== "") ? "" : "hidden";  
+        }  
+  
+        function salvaDati() {  
+            const data = document.getElementById('data_rif').value;  
+            const pal = document.getElementById('palestra').value;  
+            const cor = document.getElementById('corsa').value;  
+            const tipo = (cor === "SI") ? document.getElementById('tipo_corsa').value : "-";  
+            const km = (cor === "SI") ? document.getElementById('km_percorsi').value : 0;  
+            const dPlus = (cor === "SI") ? document.getElementById('d_plus').value : 0;  
+  
+            if(cor === "SI" && (tipo === "" || km === "")) {  
+                alert("Inserisci tipo di corsa e KM");  
+                return;  
+            }  
+  
+            const kmArrotondati = Math.round(parseFloat(km) * 100) / 100;  
+  
+            const record = { data, pal, cor, tipo, km: kmArrotondati, dplus: parseInt(dPlus) || 0 };  
+            let db = JSON.parse(localStorage.getItem('db_fitness_v5') || "[]");  
+            db.push(record);  
+            localStorage.setItem('db_fitness_v5', JSON.stringify(db));  
+              
+            alert("Salvato correttamente!");  
+              
+            document.getElementById('km_percorsi').value = "";  
+            document.getElementById('d_plus').value = "";  
+            renderGrafico();  
+        }  
+  
+        function renderGrafico() {  
+            const db = JSON.parse(localStorage.getItem('db_fitness_v5') || "[]").slice(-7);  
+            const ctx = document.getElementById('graficoKM').getContext('2d');  
+            if(myChart) myChart.destroy();  
+            myChart = new Chart(ctx, {  
+                type: 'line',  
+                data: {  
+                    labels: db.map(r => r.data.split('-').reverse().slice(0,2).join('/')),  
+                    datasets: [{  
+                        label: 'KM',  
+                        data: db.map(r => r.km),  
+                        borderColor: '#007aff',  
+                        backgroundColor: 'rgba(0,122,255,0.1)',  
+                        fill: true,  
+                        tension: 0.3  
+                    }]  
+                },  
+                options: { plugins: { legend: { display: false } } }  
+            });  
+        }  
+  
+        function esportaExcel() {  
+            const db = JSON.parse(localStorage.getItem('db_fitness_v5') || "[]");  
+            let csv = "\uFEFFData,Palestra,Corsa,Tipo,KM,D+ Metri\n";  
+            db.forEach(r => { csv += `${r.data},${r.pal},${r.cor},${r.tipo},${r.km.toFixed(2)},${r.dplus}\n`; });  
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });  
+            const link = document.createElement("a");  
+            link.href = URL.createObjectURL(blob);  
+            link.setAttribute("download", "report_fitness.csv");  
+            link.click();  
+        }  
+  
+        window.onload = renderGrafico;  
+    </script>  
+</body>  
+</html>  
+  
