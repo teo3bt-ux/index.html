@@ -14,8 +14,9 @@
             --ios-text: #FFFFFF;
             --ios-secondary-text: #8E8E93;
             --ios-border: #38383A;
-            --ios-green-soft: rgba(48, 209, 88, 0.15); /* Verde tenue per weekend */
-            --ios-yellow-soft: rgba(255, 214, 10, 0.2); /* Giallo ocra tenue per KM/D+ */
+            --ios-green-soft: rgba(48, 209, 88, 0.15);
+            --ios-yellow-soft: rgba(255, 214, 10, 0.2);
+            --ios-red: #FF453A;
         }
 
         body {
@@ -28,36 +29,33 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
         .header h1 { font-size: 34px; font-weight: 700; margin: 0; }
         .header-info { text-align: right; }
         .date-full { font-size: 15px; color: var(--ios-blue); text-transform: capitalize; display: block; font-weight: 600; }
-        .week-num { font-size: 12px; color: var(--ios-secondary-text); }
 
-        /* TABS */
         .nav-tabs { display: flex; background: #1C1C1E; padding: 2px; border-radius: 10px; margin-bottom: 25px; }
         .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; border-radius: 8px; color: var(--ios-secondary-text); }
         .tab.active { background: #3A3A3C; color: white; }
 
-        /* TABLES */
         .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 10px; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 9px; text-transform: uppercase; }
         td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; }
         
-        /* COLORI SPECIALI */
         .weekend-row { background-color: var(--ios-green-soft) !important; }
         .col-stats { background-color: var(--ios-yellow-soft); font-weight: 600; color: #FFD60A; }
-        .col-left { text-align: left; padding-left: 12px; }
+        .col-left { text-align: left; padding-left: 12px; text-transform: lowercase; }
+        .col-left::first-letter { text-transform: uppercase; }
         
-        /* UI ELEMENTS */
         .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
         .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
         .input-row:last-child { border-bottom: none; }
         input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; }
-        .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; }
-        .btn-prog { background: #2C2C2E; color: var(--ios-blue); border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; }
+        
+        .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; margin-top: 10px; }
+        .btn-export { background: var(--ios-red); color: white; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 600; border: none; width: 100%; margin: 20px 0; }
+        .btn-prog { background: #2C2C2E; color: var(--ios-blue); border: none; padding: 4px; border-radius: 4px; font-size: 10px; width: 100%; }
 
         .hidden { display: none !important; }
         .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 20px 0 8px 16px; font-weight: 600; }
@@ -68,8 +66,8 @@
     <div class="header">
         <h1>Matteo</h1>
         <div class="header-info">
-            <span id="date-full" class="date-full">-- --</span>
-            <span id="week-num" class="week-num">Settimana --</span>
+            <span id="date-full" class="date-full"></span>
+            <span id="week-num" style="font-size: 12px; color: var(--ios-secondary-text);"></span>
         </div>
     </div>
 
@@ -92,7 +90,7 @@
                 </div>
             </div>
         </div>
-        <button class="btn-main" onclick="salva()">Salva Sessione</button>
+        <button class="btn-main" onclick="salva('real')">Salva Sessione</button>
     </div>
 
     <div id="view-plan" class="hidden">
@@ -101,14 +99,11 @@
 
     <div id="view-stats" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:0 10px;">
-            <span class="section-title" style="margin:0">Filtri Anno/Sett</span>
-            <div style="display:flex; gap:10px;">
-                <select id="year-filter" onchange="aggiornaTutto()" style="color:var(--ios-blue); font-weight:700;"></select>
-                <select id="week-filter" onchange="renderSettimanale()" style="color:var(--ios-blue); font-weight:700;"></select>
-            </div>
+            <select id="year-filter" onchange="aggiornaTutto()" style="color:var(--ios-blue); font-weight:700;"></select>
+            <select id="week-filter" onchange="renderSettimanale()" style="color:var(--ios-blue); font-weight:700;"></select>
         </div>
         
-        <div class="section-title">Log Settimanale</div>
+        <div class="section-title">Dettaglio Settimana</div>
         <div class="table-container">
             <table>
                 <thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead>
@@ -118,14 +113,16 @@
         </div>
 
         <div class="section-title">Riepilogo Annuale</div>
-        <div class="table-container" style="max-height: 250px; overflow-y: auto;">
+        <div class="table-container" style="max-height: 200px; overflow-y: auto;">
             <table><tbody id="year-summary-body"></tbody></table>
         </div>
+        
+        <button class="btn-export" onclick="exportToExcel()">Esporta per Excel (CSV)</button>
     </div>
 
     <script>
-        const DB_KEY = 'fitness_v14';
-        const PLAN_KEY = 'plan_v14';
+        const DB_KEY = 'fitness_v16';
+        const PLAN_DB_KEY = 'plan_v16';
 
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -134,15 +131,19 @@
             return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
         }
 
+        function formatDataEstesa(dateObj) {
+            return dateObj.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+        }
+
         const oggi = new Date();
         document.getElementById('data_rif').valueAsDate = oggi;
-        document.getElementById('date-full').innerText = oggi.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
+        document.getElementById('date-full').innerText = formatDataEstesa(oggi);
         document.getElementById('week-num').innerText = "Settimana " + getWeekNumber(oggi);
 
         const yFilter = document.getElementById('year-filter');
         const wFilter = document.getElementById('week-filter');
         for(let i=0; i<3; i++) yFilter.innerHTML += `<option value="${oggi.getFullYear()-i}">${oggi.getFullYear()-i}</option>`;
-        for(let i=1; i<=53; i++) wFilter.innerHTML += `<option value="${i}" ${i===getWeekNumber(oggi)?'selected':''}>W${i}</option>`;
+        for(let i=1; i<=53; i++) wFilter.innerHTML += `<option value="${i}" ${i===getWeekNumber(oggi)?'selected':''}>Settimana ${i}</option>`;
 
         function toggleCorsa() {
             document.getElementById('corsa-flow').classList.toggle('hidden', document.getElementById('corsa').value === 'NO');
@@ -164,74 +165,71 @@
             if(tab === 'plan') renderProgramma();
         }
 
-        function salva() {
-            const dataVal = document.getElementById('data_rif').value;
-            let db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+        function salva(type, customData = null) {
+            const dataVal = customData ? customData.data : document.getElementById('data_rif.').value;
+            const key = type === 'real' ? DB_KEY : PLAN_DB_KEY;
+            let db = JSON.parse(localStorage.getItem(key) || "[]");
             const idx = db.findIndex(r => r.data === dataVal);
-            if(idx !== -1 && !confirm("Sovrascrivere dati esistenti?")) return;
+            if(type === 'real' && idx !== -1 && !confirm("Sovrascrivere dati esistenti?")) return;
             if(idx !== -1) db.splice(idx, 1);
-
-            const dObj = new Date(dataVal);
-            db.push({
+            
+            const entry = customData || {
                 data: dataVal,
                 pal: document.getElementById('palestra').value,
                 cor: document.getElementById('corsa').value,
                 tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
                 km: parseFloat(document.getElementById('km_percorsi').value || 0),
                 dplus: parseInt(document.getElementById('d_plus').value || 0),
-                year: dObj.getFullYear(),
-                week: getWeekNumber(dObj)
-            });
-            localStorage.setItem(DB_KEY, JSON.stringify(db));
-            alert("Salvato correttamente!");
+                year: new Date(dataVal).getFullYear(),
+                week: getWeekNumber(new Date(dataVal))
+            };
+            db.push(entry);
+            localStorage.setItem(key, JSON.stringify(db));
+            if(type === 'real') alert("Salvato!");
         }
 
         function renderProgramma() {
             const container = document.getElementById('plan-container');
             container.innerHTML = "";
-            const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
-            const plan = JSON.parse(localStorage.getItem(PLAN_KEY) || "{}");
-            
+            const planDb = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
             for(let wOffset = -1; wOffset <= 3; wOffset++) {
                 let d = new Date();
                 let dayNum = d.getDay() || 7;
                 d.setDate(d.getDate() - (dayNum - 1) + (wOffset * 7));
-                
-                let html = `<div class="section-title">${wOffset === 0 ? 'In corso' : (wOffset === -1 ? 'Scorsa' : 'Tra ' + wOffset + ' sett')} (W${getWeekNumber(d)})</div>`;
-                html += `<div class="table-container"><table>`;
-                
-                const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+                let html = `<div class="section-title">${wOffset === 0 ? 'In corso' : (wOffset === -1 ? 'Scorsa' : 'Futura')} (W${getWeekNumber(d)})</div>`;
+                html += `<div class="table-container"><table><thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead><tbody>`;
                 for(let i=0; i<7; i++) {
                     let c = new Date(d); c.setDate(d.getDate() + i);
                     const iso = c.toISOString().split('T')[0];
-                    const isWeekend = (i >= 5);
-                    const r = db.find(rec => rec.data === iso);
-                    const p = plan[iso];
-
-                    html += `<tr class="${isWeekend ? 'weekend-row' : ''}">
-                        <td class="col-left"><strong>${giorni[i]}</strong> ${c.getDate()}/${c.getMonth()+1}</td>
-                        <td style="text-align:right; padding-right:12px;">
-                            ${r ? `<span style="color:#30D158">● ${r.pal==='SI'?'Pal':''} ${r.tipo!=='-'?r.tipo:''}</span>` : 
-                             (wOffset >= 0 ? `<button class="btn-prog" onclick="addPlan('${iso}')">${p ? p : '+ Programma'}</button>` : '')}
-                        </td>
-                    </tr>`;
+                    const r = planDb.find(rec => rec.data === iso);
+                    html += `<tr class="${i >= 5 ? 'weekend-row' : ''}">
+                        <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
+                        <td>${r?.pal==='SI'?'●':''}</td><td>${r?.tipo==='Lento'?'●':''}</td><td>${r?.tipo==='Reps'?'●':''}</td>
+                        <td class="col-stats">${r?.km||''}</td><td class="col-stats">${r?.dplus||''}</td>
+                    </tr>
+                    <tr class="${i >= 5 ? 'weekend-row' : ''}"><td colspan="6" style="padding: 2px 12px 8px 12px">
+                        <button class="btn-prog" onclick="pianificaGiorno('${iso}')">${r ? 'Modifica Piano' : '+ Programma'}</button>
+                    </td></tr>`;
                 }
-                html += `</table></div>`;
+                html += `</tbody></table></div>`;
                 container.innerHTML += html;
             }
         }
 
-        function addPlan(iso) {
-            const val = prompt("Programma:");
-            if (val === null) return;
-            let plan = JSON.parse(localStorage.getItem(PLAN_KEY) || "{}");
-            if (val === "") delete plan[iso]; else plan[iso] = val;
-            localStorage.setItem(PLAN_KEY, JSON.stringify(plan));
+        function pianificaGiorno(iso) {
+            const pal = confirm("È prevista Palestra?") ? "SI" : "NO";
+            const cor = confirm("È prevista Corsa?") ? "SI" : "NO";
+            let tipo = "-", km = 0, dplus = 0;
+            if(cor === "SI") {
+                tipo = prompt("Tipo (Lento / Reps):", "Lento");
+                km = parseFloat(prompt("KM previsti:", "0"));
+                dplus = parseInt(prompt("D+ previsto:", "0"));
+            }
+            salva('plan', { data: iso, pal, cor, tipo, km, dplus, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) });
             renderProgramma();
         }
 
         function aggiornaTutto() { renderSettimanale(); renderAnnuale(); }
-        
         function renderSettimanale() {
             const targetY = parseInt(document.getElementById('year-filter').value);
             const targetW = parseInt(document.getElementById('week-filter').value);
@@ -242,29 +240,18 @@
             let d = new Date(targetY, 0, 1);
             let dayNum = d.getDay() || 7;
             d.setDate(d.getDate() + (targetW - 1) * 7 - (dayNum - 1));
-
             for (let i = 0; i < 7; i++) {
                 let c = new Date(d); c.setDate(d.getDate() + i);
                 const iso = c.toISOString().split('T')[0];
-                const isWeekend = (i >= 5);
                 const r = db.find(rec => rec.data === iso);
                 if(r){ tk+=r.km; td+=r.dplus; }
-                tbody.innerHTML += `
-                    <tr class="${isWeekend ? 'weekend-row' : ''}">
-                        <td class="col-left"><strong>${c.getDate()}/${c.getMonth()+1}</strong></td>
-                        <td class="dot">${r?.pal==='SI'?'●':''}</td>
-                        <td class="dot">${r?.tipo==='Lento'?'●':''}</td>
-                        <td class="dot">${r?.tipo==='Reps'?'●':''}</td>
-                        <td class="col-stats">${r?.km||''}</td>
-                        <td class="col-stats">${r?.dplus||''}</td>
-                    </tr>`;
-            }
-            document.getElementById('log-foot').innerHTML = `
-                <tr class="row-total">
-                    <td class="col-left">TOTALI</td><td></td><td></td><td></td>
-                    <td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td>
-                    <td class="col-stats" style="background:#FFD60A; color:black;">${td}</td>
+                tbody.innerHTML += `<tr class="${i >= 5 ? 'weekend-row' : ''}">
+                    <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
+                    <td>${r?.pal==='SI'?'●':''}</td><td>${r?.tipo==='Lento'?'●':''}</td><td>${r?.tipo==='Reps'?'●':''}</td>
+                    <td class="col-stats">${r?.km||''}</td><td class="col-stats">${r?.dplus||''}</td>
                 </tr>`;
+            }
+            document.getElementById('log-foot').innerHTML = `<tr class="row-total"><td class="col-left">TOTALI</td><td></td><td></td><td></td><td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td><td class="col-stats" style="background:#FFD60A; color:black;">${td}</td></tr>`;
         }
 
         function renderAnnuale() {
@@ -276,14 +263,40 @@
                 const data = db.filter(r => r.year === targetY && r.week === w);
                 const k = data.reduce((a, c) => a + c.km, 0);
                 const d = data.reduce((a, c) => a + c.dplus, 0);
-                if(k>0 || d>0) {
-                    tbody.innerHTML += `<tr>
-                        <td class="col-left">Settimana ${w}</td>
-                        <td class="col-stats" style="width:25%">${k.toFixed(1)} km</td>
-                        <td class="col-stats" style="width:25%">${d} m</td>
-                    </tr>`;
-                }
+                if(k>0 || d>0) tbody.innerHTML += `<tr><td class="col-left">Settimana ${w}</td><td class="col-stats">${k.toFixed(1)} km</td><td class="col-stats">${d} m</td></tr>`;
             }
+        }
+
+        function exportToExcel() {
+            const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+            if(db.length === 0) { alert("Nessun dato da esportare."); return; }
+            
+            // Ordina per data
+            db.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+            // Intestazioni (Struttura Storico)
+            let csvContent = "Data,Palestra,Lento,Reps,KM,D+\n";
+
+            db.forEach(r => {
+                const dataLeggibile = new Date(r.data).toLocaleDateString('it-IT');
+                const pal = r.pal === "SI" ? "Sì" : "No";
+                const lento = r.tipo === "Lento" ? "Sì" : "No";
+                const reps = r.tipo === "Reps" ? "Sì" : "No";
+                const km = r.km.toString().replace('.', ','); // Formato Excel italiano
+                const dplus = r.dplus;
+                
+                csvContent += `${dataLeggibile},${pal},${lento},${reps},${km},${dplus}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `workout_matteo_${new Date().getFullYear()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
