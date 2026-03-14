@@ -14,7 +14,6 @@
             --ios-text: #FFFFFF;
             --ios-secondary-text: #8E8E93;
             --ios-border: #38383A;
-            --ios-green: #30D158;
         }
 
         body {
@@ -27,82 +26,36 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-        .header h1 { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .header h1 { font-size: 34px; font-weight: 700; margin: 0; }
         .header-info { text-align: right; }
         .date-full { font-size: 15px; color: var(--ios-blue); text-transform: capitalize; display: block; font-weight: 600; }
-        .week-num { font-size: 12px; color: var(--ios-secondary-text); font-weight: 400; }
+        .week-num { font-size: 12px; color: var(--ios-secondary-text); }
 
-        /* NAV TABS */
-        .nav-tabs {
-            display: flex;
-            background: #1C1C1E;
-            padding: 2px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-        .tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 8px;
-            color: var(--ios-secondary-text);
-        }
+        .nav-tabs { display: flex; background: #1C1C1E; padding: 2px; border-radius: 10px; margin-bottom: 25px; }
+        .tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: 600; border-radius: 8px; color: var(--ios-secondary-text); }
         .tab.active { background: #3A3A3C; color: white; }
 
-        /* CARDS */
         .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
-        .input-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            min-height: 50px;
-            border-bottom: 0.5px solid var(--ios-border);
-        }
+        .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
         .input-row:last-child { border-bottom: none; }
         label { font-size: 17px; }
-        input, select {
-            background: transparent;
-            border: none;
-            color: var(--ios-blue);
-            font-size: 17px;
-            text-align: right;
-            outline: none;
-            font-family: inherit;
-            min-width: 100px;
-        }
+        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; font-family: inherit; }
 
-        .btn-main {
-            background: var(--ios-blue);
-            color: white;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 17px;
-            font-weight: 600;
-            border: none;
-            width: 100%;
-        }
+        .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; }
 
-        /* TABLE */
         .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 10px; text-transform: uppercase; text-align: center; }
+        th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 10px; text-transform: uppercase; }
         td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; }
         .col-day { text-align: left; padding-left: 12px; color: var(--ios-secondary-text); }
         .dot { font-size: 18px; color: var(--ios-text); }
-        .row-total { background: #2C2C2E; font-weight: 700; color: var(--ios-text); }
+        .row-total { background: #2C2C2E; font-weight: 700; }
 
         .hidden { display: none !important; }
-        .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 0 0 8px 16px; }
+        .filter-group { display: flex; gap: 8px; align-items: center; }
         .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin-left: 16px; }
     </style>
 </head>
 <body>
@@ -121,27 +74,12 @@
     </div>
 
     <div id="view-input">
-        <div class="section-title">Allenamento</div>
         <div class="card">
             <div class="input-row"><label>Data</label><input type="date" id="data_rif"></div>
             <div class="input-row"><label>Palestra</label><select id="palestra"><option value="NO">No</option><option value="SI">Sì</option></select></div>
-            <div class="input-row">
-                <label>Corsa</label>
-                <select id="corsa" onchange="toggleCorsa()">
-                    <option value="NO">No</option>
-                    <option value="SI">Sì</option>
-                </select>
-            </div>
-            
+            <div class="input-row"><label>Corsa</label><select id="corsa" onchange="toggleCorsa()"><option value="NO">No</option><option value="SI">Sì</option></select></div>
             <div id="corsa-flow" class="hidden">
-                <div class="input-row">
-                    <label>Tipo</label>
-                    <select id="tipo_corsa" onchange="toggleKM()">
-                        <option value="" selected disabled>Scegli...</option>
-                        <option value="Lento">Lento</option>
-                        <option value="Reps">Reps</option>
-                    </select>
-                </div>
+                <div class="input-row"><label>Tipo</label><select id="tipo_corsa" onchange="toggleKM()"><option value="" selected disabled>Scegli...</option><option value="Lento">Lento</option><option value="Reps">Reps</option></select></div>
                 <div id="corsa-dati" class="hidden">
                     <div class="input-row"><label>KM</label><input type="number" id="km_percorsi" step="0.01" inputmode="decimal" placeholder="0.00"></div>
                     <div class="input-row"><label>D+ (m)</label><input type="number" id="d_plus" inputmode="numeric" placeholder="0"></div>
@@ -153,8 +91,11 @@
 
     <div id="view-stats" class="hidden">
         <div class="filter-row">
-            <span class="section-title" style="margin:0">Riepilogo</span>
-            <select id="week-filter" onchange="renderTable()" style="color:var(--ios-blue); font-weight:600;"></select>
+            <span class="section-title" style="margin:0">Filtra</span>
+            <div class="filter-group">
+                <select id="year-filter" onchange="renderTable()" style="color:var(--ios-blue); font-weight:600;"></select>
+                <select id="week-filter" onchange="renderTable()" style="color:var(--ios-blue); font-weight:600;"></select>
+            </div>
         </div>
         <div class="table-container">
             <table>
@@ -168,6 +109,8 @@
     </div>
 
     <script>
+        const STORAGE_KEY = 'fitness_v10';
+
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
@@ -175,25 +118,26 @@
             return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
         }
 
-        // Setup Iniziale
+        // Init
         const oggi = new Date();
         document.getElementById('data_rif').valueAsDate = oggi;
         document.getElementById('date-full').innerText = oggi.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
         document.getElementById('week-num').innerText = "Settimana " + getWeekNumber(oggi);
 
-        const weekFilter = document.getElementById('week-filter');
-        for(let i=0; i<12; i++) {
-            let w = getWeekNumber(oggi) - i;
-            if(w > 0) {
-                let opt = document.createElement('option');
-                opt.value = w; opt.innerText = "Settimana " + w;
-                weekFilter.appendChild(opt);
-            }
+        // Popola Filtri
+        const yFilter = document.getElementById('year-filter');
+        const wFilter = document.getElementById('week-filter');
+        for(let i=0; i<3; i++) {
+            let y = oggi.getFullYear() - i;
+            yFilter.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+        for(let i=1; i<=53; i++) {
+            let sel = i === getWeekNumber(oggi) ? "selected" : "";
+            wFilter.innerHTML += `<option value="${i}" ${sel}>Sett ${i}</option>`;
         }
 
         function toggleCorsa() {
-            const val = document.getElementById('corsa').value;
-            document.getElementById('corsa-flow').classList.toggle('hidden', val === 'NO');
+            document.getElementById('corsa-flow').classList.toggle('hidden', document.getElementById('corsa').value === 'NO');
             toggleKM();
         }
 
@@ -212,6 +156,14 @@
 
         function salva() {
             const dataVal = document.getElementById('data_rif').value;
+            let db = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            
+            const existingIdx = db.findIndex(r => r.data === dataVal);
+            if(existingIdx !== -1) {
+                if(!confirm("Dati già presenti per questa data. Vuoi sovrascriverli?")) return;
+                db.splice(existingIdx, 1);
+            }
+
             const entry = {
                 data: dataVal,
                 pal: document.getElementById('palestra').value,
@@ -219,11 +171,12 @@
                 tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
                 km: parseFloat(document.getElementById('km_percorsi').value || 0),
                 dplus: parseInt(document.getElementById('d_plus').value || 0),
+                year: new Date(dataVal).getFullYear(),
                 week: getWeekNumber(new Date(dataVal))
             };
-            let db = JSON.parse(localStorage.getItem('fitness_v9') || "[]");
+            
             db.push(entry);
-            localStorage.setItem('fitness_v9', JSON.stringify(db));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
             
             const b = document.querySelector('.btn-main');
             b.innerText = "✓ Salvato"; b.style.background = "#30D158";
@@ -231,24 +184,24 @@
         }
 
         function renderTable() {
-            const targetWeek = parseInt(document.getElementById('week-filter').value);
-            const db = JSON.parse(localStorage.getItem('fitness_v9') || "[]");
+            const targetY = parseInt(document.getElementById('year-filter').value);
+            const targetW = parseInt(document.getElementById('week-filter').value);
+            const db = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
             const tbody = document.getElementById('log-body');
             const tfoot = document.getElementById('log-foot');
             tbody.innerHTML = "";
-            
             let totKM = 0, totD = 0;
 
-            const jan1 = new Date(new Date().getFullYear(), 0, 1);
-            const startOfWeek = new Date(jan1.setDate(jan1.getDate() + (targetWeek - 1) * 7));
-            startOfWeek.setDate(startOfWeek.getDate() + (startOfWeek.getDay() === 0 ? -6 : 1 - startOfWeek.getDay()));
+            // Trova il lunedì della settimana target
+            let d = new Date(targetY, 0, 1);
+            let dayNum = d.getDay() || 7;
+            d.setDate(d.getDate() + (targetW - 1) * 7 - (dayNum - 1));
 
             const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
             for (let i = 0; i < 7; i++) {
-                let c = new Date(startOfWeek); c.setDate(startOfWeek.getDate() + i);
+                let c = new Date(d); c.setDate(d.getDate() + i);
                 const iso = c.toISOString().split('T')[0];
                 const r = db.find(rec => rec.data === iso);
-
                 if(r) { totKM += r.km; totD += r.dplus; }
 
                 tbody.innerHTML += `<tr>
@@ -260,10 +213,7 @@
                     <td style="color:var(--ios-blue)">${r?.dplus > 0 ? r.dplus : ""}</td>
                 </tr>`;
             }
-            tfoot.innerHTML = `<tr class="row-total">
-                <td class="col-day">TOTALE</td><td></td><td></td><td></td>
-                <td>${totKM.toFixed(1)}</td><td>${totD}</td>
-            </tr>`;
+            tfoot.innerHTML = `<tr class="row-total"><td class="col-day">TOTALE</td><td></td><td></td><td></td><td>${totKM.toFixed(1)}</td><td>${totD}</td></tr>`;
         }
     </script>
 </body>
