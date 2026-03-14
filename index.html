@@ -51,7 +51,7 @@
         .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
         .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
         .input-row:last-child { border-bottom: none; }
-        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; }
+        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; width: 60%; }
         
         .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; margin-top: 10px; }
         .btn-export { background: var(--ios-red); color: white; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 600; border: none; width: 100%; margin: 20px 0; }
@@ -85,12 +85,12 @@
             <div id="corsa-flow" class="hidden">
                 <div class="input-row"><label>Tipo</label><select id="tipo_corsa" onchange="toggleKM()"><option value="" selected disabled>Scegli...</option><option value="Lento">Lento</option><option value="Reps">Reps</option></select></div>
                 <div id="corsa-dati" class="hidden">
-                    <div class="input-row"><label>KM</label><input type="number" id="km_percorsi" step="0.01" inputmode="decimal"></div>
-                    <div class="input-row"><label>D+ (m)</label><input type="number" id="d_plus" inputmode="numeric"></div>
+                    <div class="input-row"><label>KM</label><input type="text" id="km_percorsi" inputmode="decimal" placeholder="0,00"></div>
+                    <div class="input-row"><label>D+ (m)</label><input type="number" id="d_plus" inputmode="numeric" placeholder="0"></div>
                 </div>
             </div>
         </div>
-        <button class="btn-main" onclick="salva('real')">Salva Sessione</button>
+        <button id="btn-salva-main" class="btn-main" onclick="salva('real')">Salva Sessione</button>
     </div>
 
     <div id="view-plan" class="hidden">
@@ -121,8 +121,8 @@
     </div>
 
     <script>
-        const DB_KEY = 'fitness_v16';
-        const PLAN_DB_KEY = 'plan_v16';
+        const DB_KEY = 'fitness_v17';
+        const PLAN_DB_KEY = 'plan_v17';
 
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -166,26 +166,52 @@
         }
 
         function salva(type, customData = null) {
-            const dataVal = customData ? customData.data : document.getElementById('data_rif.').value;
-            const key = type === 'real' ? DB_KEY : PLAN_DB_KEY;
-            let db = JSON.parse(localStorage.getItem(key) || "[]");
-            const idx = db.findIndex(r => r.data === dataVal);
-            if(type === 'real' && idx !== -1 && !confirm("Sovrascrivere dati esistenti?")) return;
-            if(idx !== -1) db.splice(idx, 1);
-            
-            const entry = customData || {
-                data: dataVal,
-                pal: document.getElementById('palestra').value,
-                cor: document.getElementById('corsa').value,
-                tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
-                km: parseFloat(document.getElementById('km_percorsi').value || 0),
-                dplus: parseInt(document.getElementById('d_plus').value || 0),
-                year: new Date(dataVal).getFullYear(),
-                week: getWeekNumber(new Date(dataVal))
-            };
-            db.push(entry);
-            localStorage.setItem(key, JSON.stringify(db));
-            if(type === 'real') alert("Salvato!");
+            try {
+                const dataVal = customData ? customData.data : document.getElementById('data_rif').value;
+                const key = type === 'real' ? DB_KEY : PLAN_DB_KEY;
+                let db = JSON.parse(localStorage.getItem(key) || "[]");
+                
+                const idx = db.findIndex(r => r.data === dataVal);
+                if(type === 'real' && idx !== -1) {
+                    if(!confirm("Dati già presenti. Sovrascrivere?")) return;
+                    db.splice(idx, 1);
+                }
+
+                let entry;
+                if(customData) {
+                    entry = customData;
+                } else {
+                    // Pulizia input KM (converte virgola in punto per il database)
+                    let kmRaw = document.getElementById('km_percorsi').value.replace(',', '.');
+                    entry = {
+                        data: dataVal,
+                        pal: document.getElementById('palestra').value,
+                        cor: document.getElementById('corsa').value,
+                        tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
+                        km: parseFloat(kmRaw || 0),
+                        dplus: parseInt(document.getElementById('d_plus').value || 0),
+                        year: new Date(dataVal).getFullYear(),
+                        week: getWeekNumber(new Date(dataVal))
+                    };
+                }
+
+                db.push(entry);
+                localStorage.setItem(key, JSON.stringify(db));
+                
+                if(type === 'real') {
+                    const btn = document.getElementById('btn-salva-main');
+                    btn.innerText = "✓ Salvato";
+                    btn.style.background = "#30D158";
+                    setTimeout(() => { 
+                        btn.innerText = "Salva Sessione"; 
+                        btn.style.background = "var(--ios-blue)";
+                        document.getElementById('km_percorsi').value = "";
+                        document.getElementById('d_plus').value = "";
+                    }, 1500);
+                }
+            } catch(e) {
+                alert("Errore durante il salvataggio: " + e.message);
+            }
         }
 
         function renderProgramma() {
@@ -221,9 +247,10 @@
             const cor = confirm("È prevista Corsa?") ? "SI" : "NO";
             let tipo = "-", km = 0, dplus = 0;
             if(cor === "SI") {
-                tipo = prompt("Tipo (Lento / Reps):", "Lento");
-                km = parseFloat(prompt("KM previsti:", "0"));
-                dplus = parseInt(prompt("D+ previsto:", "0"));
+                tipo = prompt("Tipo (Lento / Reps):", "Lento") || "Lento";
+                let kRaw = prompt("KM previsti:", "0") || "0";
+                km = parseFloat(kRaw.replace(',', '.'));
+                dplus = parseInt(prompt("D+ previsto:", "0") || "0");
             }
             salva('plan', { data: iso, pal, cor, tipo, km, dplus, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) });
             renderProgramma();
@@ -248,7 +275,7 @@
                 tbody.innerHTML += `<tr class="${i >= 5 ? 'weekend-row' : ''}">
                     <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
                     <td>${r?.pal==='SI'?'●':''}</td><td>${r?.tipo==='Lento'?'●':''}</td><td>${r?.tipo==='Reps'?'●':''}</td>
-                    <td class="col-stats">${r?.km||''}</td><td class="col-stats">${r?.dplus||''}</td>
+                    <td class="col-stats">${r?.km ? r.km.toFixed(1) : ''}</td><td class="col-stats">${r?.dplus||''}</td>
                 </tr>`;
             }
             document.getElementById('log-foot').innerHTML = `<tr class="row-total"><td class="col-left">TOTALI</td><td></td><td></td><td></td><td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td><td class="col-stats" style="background:#FFD60A; color:black;">${td}</td></tr>`;
@@ -270,33 +297,17 @@
         function exportToExcel() {
             const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             if(db.length === 0) { alert("Nessun dato da esportare."); return; }
-            
-            // Ordina per data
             db.sort((a, b) => new Date(a.data) - new Date(b.data));
-
-            // Intestazioni (Struttura Storico)
             let csvContent = "Data,Palestra,Lento,Reps,KM,D+\n";
-
             db.forEach(r => {
                 const dataLeggibile = new Date(r.data).toLocaleDateString('it-IT');
-                const pal = r.pal === "SI" ? "Sì" : "No";
-                const lento = r.tipo === "Lento" ? "Sì" : "No";
-                const reps = r.tipo === "Reps" ? "Sì" : "No";
-                const km = r.km.toString().replace('.', ','); // Formato Excel italiano
-                const dplus = r.dplus;
-                
-                csvContent += `${dataLeggibile},${pal},${lento},${reps},${km},${dplus}\n`;
+                csvContent += `${dataLeggibile},${r.pal},${r.tipo==="Lento"?"SI":"NO"},${r.tipo==="Reps"?"SI":"NO"},${r.km.toString().replace('.', ',')},${r.dplus}\n`;
             });
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", `workout_matteo_${new Date().getFullYear()}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
+            link.href = URL.createObjectURL(blob);
+            link.download = `workout_matteo_${new Date().getFullYear()}.csv`;
             link.click();
-            document.body.removeChild(link);
         }
     </script>
 </body>
