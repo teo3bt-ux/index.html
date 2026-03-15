@@ -18,7 +18,7 @@
             --ios-green-soft: rgba(48, 209, 88, 0.15);
             --ios-yellow-soft: rgba(255, 214, 10, 0.2);
             --ios-red: #FF453A;
-            --ios-red-glow: rgba(255, 69, 58, 0.3);
+            --ios-red-glow: rgba(255, 69, 58, 0.4);
         }
 
         body {
@@ -31,55 +31,54 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Navigazione */
         .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
         .header h1 { font-size: 34px; font-weight: 700; margin: 0; }
-        .date-full { font-size: 15px; color: var(--ios-blue); text-transform: capitalize; display: block; font-weight: 600; }
+        .date-full { font-size: 15px; color: var(--ios-blue); text-transform: capitalize; font-weight: 600; }
+
         .nav-tabs { display: flex; background: #1C1C1E; padding: 2px; border-radius: 10px; margin-bottom: 25px; }
         .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; border-radius: 8px; color: var(--ios-secondary-text); cursor: pointer; }
         .tab.active { background: #3A3A3C; color: white; }
 
-        /* Tabelle e Righe */
         .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--ios-border); }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 9px; text-transform: uppercase; border-bottom: 1px solid var(--ios-border); }
         td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; min-height: 45px; }
+        
         tr:nth-child(even) { background-color: var(--ios-card-alt); }
         
         .today-row { background-color: var(--ios-red-glow) !important; outline: 2px solid var(--ios-red); outline-offset: -2px; position: relative; z-index: 1; }
         .weekend-row { background-color: var(--ios-green-soft) !important; }
-        .col-stats { background-color: var(--ios-yellow-soft); font-weight: 600; color: #FFD60A; min-width: 45px; cursor: pointer; }
+        .col-stats { background-color: var(--ios-yellow-soft); font-weight: 700; color: #FFD60A; min-width: 45px; }
         .col-left { text-align: left; padding-left: 12px; text-transform: lowercase; width: 35%; }
         .col-left::first-letter { text-transform: uppercase; }
-        .dot-cell { font-size: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .dot-cell { font-size: 18px; cursor: pointer; }
 
-        /* Registra */
         .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
         .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
-        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; }
-        .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; margin-top: 10px; }
+        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; width: 50%; }
+        .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; }
         .btn-export { background: var(--ios-red); color: white; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 600; border: none; width: 100%; margin: 20px 0; }
 
-        /* Overlay Tastierino */
-        #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1000; justify-content: center; align-items: center; }
-        .modal-card { background: #1C1C1E; width: 80%; border-radius: 14px; padding: 20px; border: 1px solid var(--ios-border); text-align: center; }
-        .modal-title { margin-bottom: 15px; font-weight: 600; color: var(--ios-secondary-text); }
-        #modal-input { width: 100%; background: #000; border-radius: 8px; padding: 15px; color: var(--ios-blue); font-size: 24px; text-align: center; margin-bottom: 20px; border: 1px solid var(--ios-blue); }
+        #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; z-index: 1000; justify-content: center; align-items: center; }
+        .modal-card { background: #1C1C1E; width: 280px; border-radius: 14px; padding: 20px; border: 1px solid var(--ios-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-title { margin-bottom: 15px; font-weight: 600; color: white; font-size: 17px; }
+        #modal-input { width: 100%; background: #000; border-radius: 10px; padding: 12px 0; color: var(--ios-blue); font-size: 28px; text-align: center; margin-bottom: 20px; border: 1px solid var(--ios-blue); box-sizing: border-box; }
         .modal-btns { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 600; font-size: 16px; cursor: pointer; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; font-size: 16px; }
         .btn-cancel { background: #3A3A3C; color: white; }
         .btn-ok { background: var(--ios-blue); color: white; }
 
+        .version-label { text-align: center; color: var(--ios-secondary-text); font-size: 10px; margin-top: 30px; opacity: 0.5; }
         .hidden { display: none !important; }
         .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 20px 0 8px 16px; font-weight: 600; }
-        #annual-scroll-box { max-height: 300px; overflow-y: auto; scroll-behavior: smooth; }
+        #annual-scroll-box { max-height: 320px; overflow-y: auto; scroll-behavior: smooth; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>Matteo</h1>
-        <div class="header-info" style="text-align: right;">
+        <div style="text-align: right;">
             <span id="date-full" class="date-full"></span>
             <span id="week-num" style="font-size: 12px; color: var(--ios-secondary-text);"></span>
         </div>
@@ -99,12 +98,13 @@
             <div id="corsa-flow" class="hidden">
                 <div class="input-row"><label>Tipo</label><select id="tipo_corsa" onchange="toggleKM()"><option value="" selected disabled>Scegli...</option><option value="Lento">Lento</option><option value="Reps">Reps</option></select></div>
                 <div id="corsa-dati" class="hidden">
-                    <div class="input-row"><label>KM</label><input type="text" id="km_percorsi" inputmode="decimal" pattern="[0-9]*" placeholder="0.0"></div>
-                    <div class="input-row"><label>D+ (m)</label><input type="text" id="d_plus" inputmode="numeric" pattern="[0-9]*" placeholder="0"></div>
+                    <div class="input-row"><label>KM</label><input type="text" id="km_percorsi" inputmode="decimal" placeholder="0.0"></div>
+                    <div class="input-row"><label>D+ (m)</label><input type="text" id="d_plus" inputmode="numeric" placeholder="0"></div>
                 </div>
             </div>
         </div>
         <button id="btn-salva-main" class="btn-main" onclick="salvaReale()">Salva Sessione</button>
+        <div class="version-label">v24.1 - Codice Sincronizzato</div>
     </div>
 
     <div id="view-plan" class="hidden">
@@ -127,17 +127,17 @@
         <div class="section-title">Riepilogo Annuale</div>
         <div class="table-container" id="annual-scroll-box">
             <table>
-                <thead><tr><th style="text-align:left;padding-left:12px;">Settimana</th><th class="col-stats">Tot KM</th><th class="col-stats">Tot D+</th></tr></thead>
+                <thead><tr><th style="text-align:left;padding-left:12px;">Sett</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead>
                 <tbody id="year-summary-body"></tbody>
             </table>
         </div>
-        <button class="btn-export" onclick="exportToExcel()">Esporta per Excel (CSV)</button>
+        <button class="btn-export" onclick="exportToExcel()">Esporta CSV (Excel)</button>
     </div>
 
     <div id="modal-overlay">
         <div class="modal-card">
             <div id="modal-title" class="modal-title">Inserisci Valore</div>
-            <input type="text" id="modal-input" inputmode="decimal" pattern="[0-9]*">
+            <input type="text" id="modal-input" inputmode="decimal">
             <div class="modal-btns">
                 <button class="modal-btn btn-cancel" onclick="closeModal()">Annulla</button>
                 <button class="modal-btn btn-ok" onclick="confirmModal()">OK</button>
@@ -146,56 +146,37 @@
     </div>
 
     <script>
-        const DB_KEY = 'fitness_v23';
-        const PLAN_DB_KEY = 'plan_v23';
+        const DB_KEY = 'fitness_v24';
+        const PLAN_DB_KEY = 'plan_v24';
         const oggi = new Date();
         const oggiIso = oggi.toISOString().split('T')[0];
 
-        // Gestione Modal
-        let currentEdit = { iso: '', field: '' };
-        function openModal(iso, field, currentVal) {
-            currentEdit = { iso, field };
-            document.getElementById('modal-title').innerText = field === 'km' ? 'Inserisci KM' : 'Inserisci D+';
-            document.getElementById('modal-input').value = currentVal || '';
-            document.getElementById('modal-overlay').style.display = 'flex';
-            setTimeout(() => document.getElementById('modal-input').focus(), 100);
-        }
-        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
-        function confirmModal() {
-            const val = document.getElementById('modal-input').value;
-            savePlanData(currentEdit.iso, currentEdit.field, val);
-            closeModal();
-        }
-
         function getWeekNumber(d) {
-            let target = new Date(d.valueOf());
-            let dayNr = (d.getDay() + 6) % 7;
-            target.setDate(target.getDate() - dayNr + 3);
-            let firstThursday = target.valueOf();
-            target.setMonth(0, 1);
-            if (target.getDay() !== 4) target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
-            return 1 + Math.ceil((firstThursday - target) / 604800000);
+            let t = new Date(d.valueOf());
+            let day = (d.getDay() + 6) % 7;
+            t.setDate(t.getDate() - day + 3);
+            let firstThurs = t.valueOf();
+            t.setMonth(0, 1);
+            if (t.getDay() !== 4) t.setMonth(0, 1 + ((4 - t.getDay()) + 7) % 7);
+            return 1 + Math.ceil((firstThurs - t) / 604800000);
         }
 
-        function formatDataEstesa(dateObj) {
-            return dateObj.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
-        }
+        function formatDataEstesa(d) { return d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }); }
 
-        // Inizializzazione Filtri
         document.getElementById('data_rif').valueAsDate = oggi;
         document.getElementById('date-full').innerText = formatDataEstesa(oggi);
         document.getElementById('week-num').innerText = "Settimana " + getWeekNumber(oggi);
-        const yFilter = document.getElementById('year-filter');
-        const wFilter = document.getElementById('week-filter');
-        for(let i=0; i<3; i++) yFilter.innerHTML += `<option value="${oggi.getFullYear()-i}">${oggi.getFullYear()-i}</option>`;
-        for(let i=1; i<=53; i++) wFilter.innerHTML += `<option value="${i}" ${i===getWeekNumber(oggi)?'selected':''}>Settimana ${i}</option>`;
+        const yF = document.getElementById('year-filter');
+        const wF = document.getElementById('week-filter');
+        for(let i=0; i<3; i++) yF.innerHTML += `<option value="${oggi.getFullYear()-i}">${oggi.getFullYear()-i}</option>`;
+        for(let i=1; i<=53; i++) wF.innerHTML += `<option value="${i}" ${i===getWeekNumber(oggi)?'selected':''}>Settimana ${i}</option>`;
 
-        function toggleCorsa() {
-            document.getElementById('corsa-flow').classList.toggle('hidden', document.getElementById('corsa').value === 'NO');
+        function toggleCorsa() { 
+            document.getElementById('corsa-flow').classList.toggle('hidden', document.getElementById('corsa').value === 'NO'); 
             toggleKM();
         }
-        function toggleKM() {
-            document.getElementById('corsa-dati').classList.toggle('hidden', document.getElementById('corsa').value === 'NO' || document.getElementById('tipo_corsa').value === "");
+        function toggleKM() { 
+            document.getElementById('corsa-dati').classList.toggle('hidden', document.getElementById('corsa').value === 'NO' || document.getElementById('tipo_corsa').value === ""); 
         }
 
         function switchTab(tab) {
@@ -206,7 +187,7 @@
                 const labels = ['reg', 'pla', 'sta'];
                 t.classList.toggle('active', labels[i] === tab.substring(0,3));
             });
-            if(tab === 'stats') { aggiornaTutto(); setTimeout(scrollToCurrentWeek, 200); }
+            if(tab === 'stats') { aggiornaTutto(); setTimeout(scrollToCurrentWeek, 300); }
             if(tab === 'plan') renderProgramma();
         }
 
@@ -239,15 +220,37 @@
             setTimeout(() => { btn.innerText = "Salva Sessione"; btn.style.background = "var(--ios-blue)"; }, 1500);
         }
 
+        let curE = { iso: '', field: '' };
+        function openModal(iso, field, val) {
+            curE = { iso, field };
+            document.getElementById('modal-title').innerText = field === 'km' ? 'Inserisci KM' : 'Inserisci D+';
+            document.getElementById('modal-input').value = val || '';
+            document.getElementById('modal-overlay').style.display = 'flex';
+            setTimeout(() => document.getElementById('modal-input').focus(), 150);
+        }
+        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+        function confirmModal() {
+            const val = document.getElementById('modal-input').value;
+            let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
+            let idx = db.findIndex(r => r.data === curE.iso);
+            let r = idx !== -1 ? db[idx] : { data: curE.iso, pal: "NO", tipo: "-", km: 0, dplus: 0, year: new Date(curE.iso).getFullYear(), week: getWeekNumber(new Date(curE.iso)) };
+            if(curE.field === 'km') r.km = parseFloat(val.replace(',', '.') || 0);
+            else r.dplus = parseInt(val || 0);
+            if(idx !== -1) db[idx] = r; else db.push(r);
+            localStorage.setItem(PLAN_DB_KEY, JSON.stringify(db));
+            renderProgramma();
+            closeModal();
+        }
+
         function renderProgramma() {
             const container = document.getElementById('plan-container');
             container.innerHTML = "";
             const planDb = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
-            for(let wOffset = -1; wOffset <= 3; wOffset++) {
+            for(let wO = -1; wO <= 3; wO++) {
                 let d = new Date();
                 let dayNum = (d.getDay() + 6) % 7;
-                d.setDate(d.getDate() - dayNum + (wOffset * 7));
-                let html = `<div class="section-title">${wOffset === 0 ? 'In corso' : (wOffset === -1 ? 'Scorsa' : 'Futura')} (W${getWeekNumber(d)})</div>`;
+                d.setDate(d.getDate() - dayNum + (wO * 7));
+                let html = `<div class="section-title">${wO === 0 ? 'Settimana In corso' : (wO === -1 ? 'Settimana Scorsa' : 'Settimana Prossima')}</div>`;
                 html += `<div class="table-container"><table><thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead><tbody>`;
                 for(let i=0; i<7; i++) {
                     let c = new Date(d); c.setDate(d.getDate() + i);
@@ -267,17 +270,6 @@
             }
         }
 
-        function savePlanData(iso, field, val) {
-            let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
-            let idx = db.findIndex(r => r.data === iso);
-            let r = idx !== -1 ? db[idx] : { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) };
-            if(field === 'km') r.km = parseFloat(val.replace(',', '.') || 0);
-            else if(field === 'dplus') r.dplus = parseInt(val || 0);
-            if(idx !== -1) db[idx] = r; else db.push(r);
-            localStorage.setItem(PLAN_DB_KEY, JSON.stringify(db));
-            renderProgramma();
-        }
-
         function togglePlanCell(iso, field) {
             let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
             let idx = db.findIndex(r => r.data === iso);
@@ -290,45 +282,50 @@
         }
 
         function aggiornaTutto() { renderSettimanale(); renderAnnuale(); }
+
         function renderSettimanale() {
-            const targetY = parseInt(document.getElementById('year-filter').value);
-            const targetW = parseInt(document.getElementById('week-filter').value);
+            const tY = parseInt(document.getElementById('year-filter').value);
+            const tW = parseInt(document.getElementById('week-filter').value);
             const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             const tbody = document.getElementById('log-body');
             tbody.innerHTML = "";
             let tk=0, td=0;
-            let d = new Date(targetY, 0, 4); 
+            let d = new Date(tY, 0, 4); 
             let dayNum = (d.getDay() + 6) % 7;
-            d.setDate(d.getDate() - dayNum + (targetW - 1) * 7);
+            d.setDate(d.getDate() - dayNum + (tW - 1) * 7);
             for (let i = 0; i < 7; i++) {
                 let c = new Date(d); c.setDate(d.getDate() + i);
                 const iso = c.toISOString().split('T')[0];
                 const r = db.find(rec => rec.data === iso);
-                if(r){ tk += Number(r.km); td += Number(r.dplus); }
+                if(r){ 
+                    tk += parseFloat(r.km || 0); 
+                    td += parseInt(r.dplus || 0); 
+                }
                 tbody.innerHTML += `<tr class="${i >= 5 ? 'weekend-row' : ''} ${iso === oggiIso ? 'today-row' : ''}">
                     <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
                     <td>${r?.pal==='SI'?'●':''}</td><td>${r?.tipo==='Lento'?'●':''}</td><td>${r?.tipo==='Reps'?'●':''}</td>
-                    <td class="col-stats">${(r?.km && r.km > 0) ? Number(r.km).toFixed(1) : ''}</td><td class="col-stats">${(r?.dplus && r.dplus > 0) ? r.dplus : ''}</td>
+                    <td class="col-stats">${(r?.km > 0) ? parseFloat(r.km).toFixed(1) : ''}</td>
+                    <td class="col-stats">${(r?.dplus > 0) ? r.dplus : ''}</td>
                 </tr>`;
             }
-            document.getElementById('log-foot').innerHTML = `<tr class="row-total" style="background:#2C2C2E;"><td class="col-left">TOTALI</td><td></td><td></td><td></td><td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td><td class="col-stats" style="background:#FFD60A; color:black;">${td}</td></tr>`;
+            document.getElementById('log-foot').innerHTML = `<tr style="background:#2C2C2E; font-weight:700;"><td class="col-left">TOTALI</td><td></td><td></td><td></td><td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td><td class="col-stats" style="background:#FFD60A; color:black;">${td}</td></tr>`;
         }
 
         function renderAnnuale() {
-            const targetY = parseInt(document.getElementById('year-filter').value);
+            const tY = parseInt(document.getElementById('year-filter').value);
             const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             const tbody = document.getElementById('year-summary-body');
             tbody.innerHTML = "";
-            const currWeek = getWeekNumber(oggi);
+            const currW = getWeekNumber(oggi);
             for (let w = 1; w <= 53; w++) {
-                const dataS = db.filter(r => Number(r.year) === targetY && Number(r.week) === w);
-                const k = dataS.reduce((a, c) => a + Number(c.km), 0);
-                const d = dataS.reduce((a, c) => a + Number(c.dplus), 0);
-                const isThis = (targetY === oggi.getFullYear() && w === currWeek);
+                const dataS = db.filter(r => parseInt(r.year) === tY && parseInt(r.week) === w);
+                const k = dataS.reduce((a, c) => a + parseFloat(c.km || 0), 0);
+                const d = dataS.reduce((a, c) => a + parseInt(c.dplus || 0), 0);
+                const isThis = (tY === oggi.getFullYear() && w === currW);
                 tbody.innerHTML += `<tr class="${isThis ? 'today-row' : ''}">
                     <td class="col-left">Settimana ${w}</td>
-                    <td class="col-stats">${k > 0 ? k.toFixed(1) + ' km' : '-'}</td>
-                    <td class="col-stats">${d > 0 ? d + ' m' : '-'}</td>
+                    <td class="col-stats">${k > 0 ? k.toFixed(1) : '-'}</td>
+                    <td class="col-stats">${d > 0 ? d : '-'}</td>
                 </tr>`;
             }
         }
@@ -337,9 +334,9 @@
             const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             if(db.length === 0) return;
             db.sort((a, b) => new Date(a.data) - new Date(b.data));
-            let csv = "Data,Palestra,Lento,Reps,KM,D+\n";
+            let csv = "Data,Palestra,Tipo,KM,D+\n";
             db.forEach(r => {
-                csv += `${new Date(r.data).toLocaleDateString('it-IT')},${r.pal},${r.tipo==='Lento'?'SI':'NO'},${r.tipo==='Reps'?'SI':'NO'},${r.km.toString().replace('.', ',')},${r.dplus}\n`;
+                csv += `${r.data},${r.pal},${r.tipo},${r.km.toString().replace('.', ',')},${r.dplus}\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const link = document.createElement("a");
