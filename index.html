@@ -31,43 +31,44 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Navigazione */
         .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
         .header h1 { font-size: 34px; font-weight: 700; margin: 0; }
-        .header-info { text-align: right; }
         .date-full { font-size: 15px; color: var(--ios-blue); text-transform: capitalize; display: block; font-weight: 600; }
-
         .nav-tabs { display: flex; background: #1C1C1E; padding: 2px; border-radius: 10px; margin-bottom: 25px; }
-        .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; border-radius: 8px; color: var(--ios-secondary-text); }
+        .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; border-radius: 8px; color: var(--ios-secondary-text); cursor: pointer; }
         .tab.active { background: #3A3A3C; color: white; }
 
+        /* Tabelle e Righe */
         .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--ios-border); }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 9px; text-transform: uppercase; border-bottom: 1px solid var(--ios-border); }
-        
         td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; min-height: 45px; }
         tr:nth-child(even) { background-color: var(--ios-card-alt); }
         
-        .today-row { 
-            background-color: var(--ios-red-glow) !important;
-            outline: 2px solid var(--ios-red);
-            outline-offset: -2px;
-            position: relative;
-            z-index: 1;
-        }
-
+        .today-row { background-color: var(--ios-red-glow) !important; outline: 2px solid var(--ios-red); outline-offset: -2px; position: relative; z-index: 1; }
         .weekend-row { background-color: var(--ios-green-soft) !important; }
-        .col-stats { background-color: var(--ios-yellow-soft); font-weight: 600; color: #FFD60A; min-width: 45px; }
+        .col-stats { background-color: var(--ios-yellow-soft); font-weight: 600; color: #FFD60A; min-width: 45px; cursor: pointer; }
         .col-left { text-align: left; padding-left: 12px; text-transform: lowercase; width: 35%; }
         .col-left::first-letter { text-transform: uppercase; }
-        
         .dot-cell { font-size: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        
+
+        /* Registra */
         .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
         .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
         input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; }
-        
         .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; margin-top: 10px; }
         .btn-export { background: var(--ios-red); color: white; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 600; border: none; width: 100%; margin: 20px 0; }
+
+        /* Overlay Tastierino */
+        #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1000; justify-content: center; align-items: center; }
+        .modal-card { background: #1C1C1E; width: 80%; border-radius: 14px; padding: 20px; border: 1px solid var(--ios-border); text-align: center; }
+        .modal-title { margin-bottom: 15px; font-weight: 600; color: var(--ios-secondary-text); }
+        #modal-input { width: 100%; background: #000; border-radius: 8px; padding: 15px; color: var(--ios-blue); font-size: 24px; text-align: center; margin-bottom: 20px; border: 1px solid var(--ios-blue); }
+        .modal-btns { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 600; font-size: 16px; cursor: pointer; }
+        .btn-cancel { background: #3A3A3C; color: white; }
+        .btn-ok { background: var(--ios-blue); color: white; }
 
         .hidden { display: none !important; }
         .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 20px 0 8px 16px; font-weight: 600; }
@@ -78,7 +79,7 @@
 
     <div class="header">
         <h1>Matteo</h1>
-        <div class="header-info">
+        <div class="header-info" style="text-align: right;">
             <span id="date-full" class="date-full"></span>
             <span id="week-num" style="font-size: 12px; color: var(--ios-secondary-text);"></span>
         </div>
@@ -98,16 +99,12 @@
             <div id="corsa-flow" class="hidden">
                 <div class="input-row"><label>Tipo</label><select id="tipo_corsa" onchange="toggleKM()"><option value="" selected disabled>Scegli...</option><option value="Lento">Lento</option><option value="Reps">Reps</option></select></div>
                 <div id="corsa-dati" class="hidden">
-                    <div class="input-row"><label>KM</label>
-                        <input type="text" id="km_percorsi" inputmode="decimal" pattern="[0-9]*" placeholder="0.0">
-                    </div>
-                    <div class="input-row"><label>D+ (m)</label>
-                        <input type="text" id="d_plus" inputmode="numeric" pattern="[0-9]*" placeholder="0">
-                    </div>
+                    <div class="input-row"><label>KM</label><input type="text" id="km_percorsi" inputmode="decimal" pattern="[0-9]*" placeholder="0.0"></div>
+                    <div class="input-row"><label>D+ (m)</label><input type="text" id="d_plus" inputmode="numeric" pattern="[0-9]*" placeholder="0"></div>
                 </div>
             </div>
         </div>
-        <button id="btn-salva-main" class="btn-main" onclick="salva('real')">Salva Sessione</button>
+        <button id="btn-salva-main" class="btn-main" onclick="salvaReale()">Salva Sessione</button>
     </div>
 
     <div id="view-plan" class="hidden">
@@ -116,9 +113,10 @@
 
     <div id="view-stats" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:0 10px;">
-            <select id="year-filter" onchange="aggiornaTutto()" style="color:var(--ios-blue); font-weight:700;"></select>
-            <select id="week-filter" onchange="renderSettimanale()" style="color:var(--ios-blue); font-weight:700;"></select>
+            <select id="year-filter" onchange="aggiornaTutto()" style="color:var(--ios-blue); font-weight:700; background:none;"></select>
+            <select id="week-filter" onchange="renderSettimanale()" style="color:var(--ios-blue); font-weight:700; background:none;"></select>
         </div>
+        <div class="section-title">Dettaglio Settimana</div>
         <div class="table-container">
             <table>
                 <thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead>
@@ -136,32 +134,61 @@
         <button class="btn-export" onclick="exportToExcel()">Esporta per Excel (CSV)</button>
     </div>
 
+    <div id="modal-overlay">
+        <div class="modal-card">
+            <div id="modal-title" class="modal-title">Inserisci Valore</div>
+            <input type="text" id="modal-input" inputmode="decimal" pattern="[0-9]*">
+            <div class="modal-btns">
+                <button class="modal-btn btn-cancel" onclick="closeModal()">Annulla</button>
+                <button class="modal-btn btn-ok" onclick="confirmModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const DB_KEY = 'fitness_v21';
-        const PLAN_DB_KEY = 'plan_v21';
+        const DB_KEY = 'fitness_v23';
+        const PLAN_DB_KEY = 'plan_v23';
         const oggi = new Date();
         const oggiIso = oggi.toISOString().split('T')[0];
-        const weekCorrente = getWeekNumber(oggi);
+
+        // Gestione Modal
+        let currentEdit = { iso: '', field: '' };
+        function openModal(iso, field, currentVal) {
+            currentEdit = { iso, field };
+            document.getElementById('modal-title').innerText = field === 'km' ? 'Inserisci KM' : 'Inserisci D+';
+            document.getElementById('modal-input').value = currentVal || '';
+            document.getElementById('modal-overlay').style.display = 'flex';
+            setTimeout(() => document.getElementById('modal-input').focus(), 100);
+        }
+        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+        function confirmModal() {
+            const val = document.getElementById('modal-input').value;
+            savePlanData(currentEdit.iso, currentEdit.field, val);
+            closeModal();
+        }
 
         function getWeekNumber(d) {
-            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
-            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-            return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+            let target = new Date(d.valueOf());
+            let dayNr = (d.getDay() + 6) % 7;
+            target.setDate(target.getDate() - dayNr + 3);
+            let firstThursday = target.valueOf();
+            target.setMonth(0, 1);
+            if (target.getDay() !== 4) target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+            return 1 + Math.ceil((firstThursday - target) / 604800000);
         }
 
         function formatDataEstesa(dateObj) {
             return dateObj.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
         }
 
+        // Inizializzazione Filtri
         document.getElementById('data_rif').valueAsDate = oggi;
         document.getElementById('date-full').innerText = formatDataEstesa(oggi);
-        document.getElementById('week-num').innerText = "Settimana " + weekCorrente;
-
+        document.getElementById('week-num').innerText = "Settimana " + getWeekNumber(oggi);
         const yFilter = document.getElementById('year-filter');
         const wFilter = document.getElementById('week-filter');
         for(let i=0; i<3; i++) yFilter.innerHTML += `<option value="${oggi.getFullYear()-i}">${oggi.getFullYear()-i}</option>`;
-        for(let i=1; i<=53; i++) wFilter.innerHTML += `<option value="${i}" ${i===weekCorrente?'selected':''}>Settimana ${i}</option>`;
+        for(let i=1; i<=53; i++) wFilter.innerHTML += `<option value="${i}" ${i===getWeekNumber(oggi)?'selected':''}>Settimana ${i}</option>`;
 
         function toggleCorsa() {
             document.getElementById('corsa-flow').classList.toggle('hidden', document.getElementById('corsa').value === 'NO');
@@ -179,43 +206,37 @@
                 const labels = ['reg', 'pla', 'sta'];
                 t.classList.toggle('active', labels[i] === tab.substring(0,3));
             });
-            if(tab === 'stats') {
-                aggiornaTutto();
-                setTimeout(scrollToCurrentWeek, 100);
-            }
+            if(tab === 'stats') { aggiornaTutto(); setTimeout(scrollToCurrentWeek, 200); }
             if(tab === 'plan') renderProgramma();
         }
 
         function scrollToCurrentWeek() {
-            const activeRow = document.querySelector('#year-summary-body .today-row');
-            if (activeRow) {
-                activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            const container = document.getElementById('annual-scroll-box');
+            const activeRow = container.querySelector('.today-row');
+            if (activeRow) container.scrollTop = activeRow.offsetTop - (container.offsetHeight / 2);
         }
 
-        function salva(type, customData = null) {
-            const dataVal = customData ? customData.data : document.getElementById('data_rif').value;
-            const key = type === 'real' ? DB_KEY : PLAN_DB_KEY;
-            let db = JSON.parse(localStorage.getItem(key) || "[]");
+        function salvaReale() {
+            const dataVal = document.getElementById('data_rif').value;
+            let db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             const idx = db.findIndex(r => r.data === dataVal);
-            if(type === 'real' && idx !== -1 && !confirm("Sovrascrivere?")) return;
+            if(idx !== -1 && !confirm("Sovrascrivere?")) return;
             if(idx !== -1) db.splice(idx, 1);
-            
-            let entry = customData || {
-                data: dataVal, pal: document.getElementById('palestra').value,
+
+            db.push({
+                data: dataVal,
+                pal: document.getElementById('palestra').value,
                 cor: document.getElementById('corsa').value,
                 tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
                 km: parseFloat(document.getElementById('km_percorsi').value.replace(',', '.') || 0),
                 dplus: parseInt(document.getElementById('d_plus').value || 0),
-                year: new Date(dataVal).getFullYear(), week: getWeekNumber(new Date(dataVal))
-            };
-            db.push(entry);
-            localStorage.setItem(key, JSON.stringify(db));
-            if(type === 'real') {
-                const btn = document.getElementById('btn-salva-main');
-                btn.innerText = "✓ Salvato"; btn.style.background = "#30D158";
-                setTimeout(() => { btn.innerText = "Salva Sessione"; btn.style.background = "var(--ios-blue)"; }, 1500);
-            }
+                year: new Date(dataVal).getFullYear(),
+                week: getWeekNumber(new Date(dataVal))
+            });
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            const btn = document.getElementById('btn-salva-main');
+            btn.innerText = "✓ Salvato"; btn.style.background = "#30D158";
+            setTimeout(() => { btn.innerText = "Salva Sessione"; btn.style.background = "var(--ios-blue)"; }, 1500);
         }
 
         function renderProgramma() {
@@ -224,8 +245,8 @@
             const planDb = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
             for(let wOffset = -1; wOffset <= 3; wOffset++) {
                 let d = new Date();
-                let dayNum = d.getDay() || 7;
-                d.setDate(d.getDate() - (dayNum - 1) + (wOffset * 7));
+                let dayNum = (d.getDay() + 6) % 7;
+                d.setDate(d.getDate() - dayNum + (wOffset * 7));
                 let html = `<div class="section-title">${wOffset === 0 ? 'In corso' : (wOffset === -1 ? 'Scorsa' : 'Futura')} (W${getWeekNumber(d)})</div>`;
                 html += `<div class="table-container"><table><thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead><tbody>`;
                 for(let i=0; i<7; i++) {
@@ -237,13 +258,24 @@
                         <td class="dot-cell" onclick="togglePlanCell('${iso}', 'pal')">${r.pal==='SI'?'●':''}</td>
                         <td class="dot-cell" onclick="togglePlanCell('${iso}', 'Lento')">${r.tipo==='Lento'?'●':''}</td>
                         <td class="dot-cell" onclick="togglePlanCell('${iso}', 'Reps')">${r.tipo==='Reps'?'●':''}</td>
-                        <td class="col-stats" onclick="editPlanValue('${iso}', 'km')">${r.km > 0 ? r.km.toFixed(1) : ''}</td>
-                        <td class="col-stats" onclick="editPlanValue('${iso}', 'dplus')">${r.dplus > 0 ? r.dplus : ''}</td>
+                        <td class="col-stats" onclick="openModal('${iso}', 'km', '${r.km||''}')">${r.km > 0 ? r.km : ''}</td>
+                        <td class="col-stats" onclick="openModal('${iso}', 'dplus', '${r.dplus||''}')">${r.dplus > 0 ? r.dplus : ''}</td>
                     </tr>`;
                 }
                 html += `</tbody></table></div>`;
                 container.innerHTML += html;
             }
+        }
+
+        function savePlanData(iso, field, val) {
+            let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
+            let idx = db.findIndex(r => r.data === iso);
+            let r = idx !== -1 ? db[idx] : { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) };
+            if(field === 'km') r.km = parseFloat(val.replace(',', '.') || 0);
+            else if(field === 'dplus') r.dplus = parseInt(val || 0);
+            if(idx !== -1) db[idx] = r; else db.push(r);
+            localStorage.setItem(PLAN_DB_KEY, JSON.stringify(db));
+            renderProgramma();
         }
 
         function togglePlanCell(iso, field) {
@@ -257,22 +289,6 @@
             renderProgramma();
         }
 
-        function editPlanValue(iso, field) {
-            let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
-            let idx = db.findIndex(r => r.data === iso);
-            let r = idx !== -1 ? db[idx] : { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) };
-            
-            // Per i prompt usiamo inputmode decimal via JS non è possibile direttamente, ma prompt è nativo
-            let val = prompt(field === 'km' ? "KM (usa il punto per i decimali):" : "D+:");
-            if(val !== null) {
-                if(field === 'km') r.km = parseFloat(val.replace(',', '.') || 0);
-                else r.dplus = parseInt(val || 0);
-                if(idx !== -1) db[idx] = r; else db.push(r);
-                localStorage.setItem(PLAN_DB_KEY, JSON.stringify(db));
-                renderProgramma();
-            }
-        }
-
         function aggiornaTutto() { renderSettimanale(); renderAnnuale(); }
         function renderSettimanale() {
             const targetY = parseInt(document.getElementById('year-filter').value);
@@ -281,18 +297,18 @@
             const tbody = document.getElementById('log-body');
             tbody.innerHTML = "";
             let tk=0, td=0;
-            let d = new Date(targetY, 0, 1);
-            let dayNum = d.getDay() || 7;
-            d.setDate(d.getDate() + (targetW - 1) * 7 - (dayNum - 1));
+            let d = new Date(targetY, 0, 4); 
+            let dayNum = (d.getDay() + 6) % 7;
+            d.setDate(d.getDate() - dayNum + (targetW - 1) * 7);
             for (let i = 0; i < 7; i++) {
                 let c = new Date(d); c.setDate(d.getDate() + i);
                 const iso = c.toISOString().split('T')[0];
                 const r = db.find(rec => rec.data === iso);
-                if(r){ tk+=r.km; td+=r.dplus; }
+                if(r){ tk += Number(r.km); td += Number(r.dplus); }
                 tbody.innerHTML += `<tr class="${i >= 5 ? 'weekend-row' : ''} ${iso === oggiIso ? 'today-row' : ''}">
                     <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
                     <td>${r?.pal==='SI'?'●':''}</td><td>${r?.tipo==='Lento'?'●':''}</td><td>${r?.tipo==='Reps'?'●':''}</td>
-                    <td class="col-stats">${r?.km ? r.km.toFixed(1) : ''}</td><td class="col-stats">${r?.dplus||''}</td>
+                    <td class="col-stats">${(r?.km && r.km > 0) ? Number(r.km).toFixed(1) : ''}</td><td class="col-stats">${(r?.dplus && r.dplus > 0) ? r.dplus : ''}</td>
                 </tr>`;
             }
             document.getElementById('log-foot').innerHTML = `<tr class="row-total" style="background:#2C2C2E;"><td class="col-left">TOTALI</td><td></td><td></td><td></td><td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td><td class="col-stats" style="background:#FFD60A; color:black;">${td}</td></tr>`;
@@ -303,15 +319,13 @@
             const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             const tbody = document.getElementById('year-summary-body');
             tbody.innerHTML = "";
-            const currYear = oggi.getFullYear();
-
+            const currWeek = getWeekNumber(oggi);
             for (let w = 1; w <= 53; w++) {
-                const data = db.filter(r => r.year === targetY && r.week === w);
-                const k = data.reduce((a, c) => a + c.km, 0);
-                const d = data.reduce((a, c) => a + c.dplus, 0);
-                const isThisWeek = (targetY === currYear && w === weekCorrente);
-                
-                tbody.innerHTML += `<tr class="${isThisWeek ? 'today-row' : ''}">
+                const dataS = db.filter(r => Number(r.year) === targetY && Number(r.week) === w);
+                const k = dataS.reduce((a, c) => a + Number(c.km), 0);
+                const d = dataS.reduce((a, c) => a + Number(c.dplus), 0);
+                const isThis = (targetY === oggi.getFullYear() && w === currWeek);
+                tbody.innerHTML += `<tr class="${isThis ? 'today-row' : ''}">
                     <td class="col-left">Settimana ${w}</td>
                     <td class="col-stats">${k > 0 ? k.toFixed(1) + ' km' : '-'}</td>
                     <td class="col-stats">${d > 0 ? d + ' m' : '-'}</td>
