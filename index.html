@@ -44,7 +44,6 @@
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 9px; text-transform: uppercase; border-bottom: 1px solid var(--ios-border); }
         
-        /* EFFETTO ZEBRA E RIGHE */
         td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; min-height: 45px; }
         tr:nth-child(even) { background-color: var(--ios-card-alt); }
         
@@ -72,6 +71,7 @@
 
         .hidden { display: none !important; }
         .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 20px 0 8px 16px; font-weight: 600; }
+        #annual-scroll-box { max-height: 300px; overflow-y: auto; scroll-behavior: smooth; }
     </style>
 </head>
 <body>
@@ -98,8 +98,12 @@
             <div id="corsa-flow" class="hidden">
                 <div class="input-row"><label>Tipo</label><select id="tipo_corsa" onchange="toggleKM()"><option value="" selected disabled>Scegli...</option><option value="Lento">Lento</option><option value="Reps">Reps</option></select></div>
                 <div id="corsa-dati" class="hidden">
-                    <div class="input-row"><label>KM</label><input type="number" id="km_percorsi" step="0.1" inputmode="decimal" placeholder="0.0"></div>
-                    <div class="input-row"><label>D+ (m)</label><input type="number" id="d_plus" inputmode="numeric" placeholder="0"></div>
+                    <div class="input-row"><label>KM</label>
+                        <input type="text" id="km_percorsi" inputmode="decimal" pattern="[0-9]*" placeholder="0.0">
+                    </div>
+                    <div class="input-row"><label>D+ (m)</label>
+                        <input type="text" id="d_plus" inputmode="numeric" pattern="[0-9]*" placeholder="0">
+                    </div>
                 </div>
             </div>
         </div>
@@ -123,7 +127,7 @@
             </table>
         </div>
         <div class="section-title">Riepilogo Annuale</div>
-        <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+        <div class="table-container" id="annual-scroll-box">
             <table>
                 <thead><tr><th style="text-align:left;padding-left:12px;">Settimana</th><th class="col-stats">Tot KM</th><th class="col-stats">Tot D+</th></tr></thead>
                 <tbody id="year-summary-body"></tbody>
@@ -133,8 +137,8 @@
     </div>
 
     <script>
-        const DB_KEY = 'fitness_v20';
-        const PLAN_DB_KEY = 'plan_v20';
+        const DB_KEY = 'fitness_v21';
+        const PLAN_DB_KEY = 'plan_v21';
         const oggi = new Date();
         const oggiIso = oggi.toISOString().split('T')[0];
         const weekCorrente = getWeekNumber(oggi);
@@ -175,8 +179,18 @@
                 const labels = ['reg', 'pla', 'sta'];
                 t.classList.toggle('active', labels[i] === tab.substring(0,3));
             });
-            if(tab === 'stats') aggiornaTutto();
+            if(tab === 'stats') {
+                aggiornaTutto();
+                setTimeout(scrollToCurrentWeek, 100);
+            }
             if(tab === 'plan') renderProgramma();
+        }
+
+        function scrollToCurrentWeek() {
+            const activeRow = document.querySelector('#year-summary-body .today-row');
+            if (activeRow) {
+                activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
 
         function salva(type, customData = null) {
@@ -191,7 +205,7 @@
                 data: dataVal, pal: document.getElementById('palestra').value,
                 cor: document.getElementById('corsa').value,
                 tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
-                km: parseFloat(document.getElementById('km_percorsi').value || 0),
+                km: parseFloat(document.getElementById('km_percorsi').value.replace(',', '.') || 0),
                 dplus: parseInt(document.getElementById('d_plus').value || 0),
                 year: new Date(dataVal).getFullYear(), week: getWeekNumber(new Date(dataVal))
             };
@@ -247,7 +261,9 @@
             let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
             let idx = db.findIndex(r => r.data === iso);
             let r = idx !== -1 ? db[idx] : { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) };
-            let val = prompt(field === 'km' ? "KM:" : "D+:");
+            
+            // Per i prompt usiamo inputmode decimal via JS non è possibile direttamente, ma prompt è nativo
+            let val = prompt(field === 'km' ? "KM (usa il punto per i decimali):" : "D+:");
             if(val !== null) {
                 if(field === 'km') r.km = parseFloat(val.replace(',', '.') || 0);
                 else r.dplus = parseInt(val || 0);
