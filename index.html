@@ -17,6 +17,7 @@
             --ios-green-soft: rgba(48, 209, 88, 0.15);
             --ios-yellow-soft: rgba(255, 214, 10, 0.2);
             --ios-red: #FF453A;
+            --ios-red-glow: rgba(255, 69, 58, 0.3);
         }
 
         body {
@@ -38,24 +39,33 @@
         .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; border-radius: 8px; color: var(--ios-secondary-text); }
         .tab.active { background: #3A3A3C; color: white; }
 
-        .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
+        .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--ios-border); }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 9px; text-transform: uppercase; }
-        td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; }
+        td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; min-height: 45px; }
         
-        .weekend-row { background-color: var(--ios-green-soft) !important; }
-        .col-stats { background-color: var(--ios-yellow-soft); font-weight: 600; color: #FFD60A; }
-        .col-left { text-align: left; padding-left: 12px; text-transform: lowercase; }
+        /* EVIDENZIAZIONE OGGI */
+        .today-row { 
+            background-color: var(--ios-red-glow) !important;
+            outline: 2px solid var(--ios-red);
+            outline-offset: -2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .weekend-row { background-color: var(--ios-green-soft); }
+        .col-stats { background-color: var(--ios-yellow-soft); font-weight: 600; color: #FFD60A; min-width: 45px; }
+        .col-left { text-align: left; padding-left: 12px; text-transform: lowercase; width: 35%; }
         .col-left::first-letter { text-transform: uppercase; }
+        
+        .dot-cell { font-size: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; width: 12%; }
         
         .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
         .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
-        .input-row:last-child { border-bottom: none; }
-        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; width: 60%; }
+        input, select { background: transparent; border: none; color: var(--ios-blue); font-size: 17px; text-align: right; outline: none; }
         
         .btn-main { background: var(--ios-blue); color: white; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; border: none; width: 100%; margin-top: 10px; }
         .btn-export { background: var(--ios-red); color: white; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 600; border: none; width: 100%; margin: 20px 0; }
-        .btn-prog { background: #2C2C2E; color: var(--ios-blue); border: none; padding: 4px; border-radius: 4px; font-size: 10px; width: 100%; }
 
         .hidden { display: none !important; }
         .section-title { font-size: 13px; color: var(--ios-secondary-text); text-transform: uppercase; margin: 20px 0 8px 16px; font-weight: 600; }
@@ -102,8 +112,6 @@
             <select id="year-filter" onchange="aggiornaTutto()" style="color:var(--ios-blue); font-weight:700;"></select>
             <select id="week-filter" onchange="renderSettimanale()" style="color:var(--ios-blue); font-weight:700;"></select>
         </div>
-        
-        <div class="section-title">Dettaglio Settimana</div>
         <div class="table-container">
             <table>
                 <thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead>
@@ -111,18 +119,17 @@
                 <tfoot id="log-foot"></tfoot>
             </table>
         </div>
-
         <div class="section-title">Riepilogo Annuale</div>
         <div class="table-container" style="max-height: 200px; overflow-y: auto;">
             <table><tbody id="year-summary-body"></tbody></table>
         </div>
-        
         <button class="btn-export" onclick="exportToExcel()">Esporta per Excel (CSV)</button>
     </div>
 
     <script>
-        const DB_KEY = 'fitness_v17';
-        const PLAN_DB_KEY = 'plan_v17';
+        const DB_KEY = 'fitness_v19';
+        const PLAN_DB_KEY = 'plan_v19';
+        const oggiIso = new Date().toISOString().split('T')[0];
 
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -166,51 +173,27 @@
         }
 
         function salva(type, customData = null) {
-            try {
-                const dataVal = customData ? customData.data : document.getElementById('data_rif').value;
-                const key = type === 'real' ? DB_KEY : PLAN_DB_KEY;
-                let db = JSON.parse(localStorage.getItem(key) || "[]");
-                
-                const idx = db.findIndex(r => r.data === dataVal);
-                if(type === 'real' && idx !== -1) {
-                    if(!confirm("Dati già presenti. Sovrascrivere?")) return;
-                    db.splice(idx, 1);
-                }
-
-                let entry;
-                if(customData) {
-                    entry = customData;
-                } else {
-                    // Pulizia input KM (converte virgola in punto per il database)
-                    let kmRaw = document.getElementById('km_percorsi').value.replace(',', '.');
-                    entry = {
-                        data: dataVal,
-                        pal: document.getElementById('palestra').value,
-                        cor: document.getElementById('corsa').value,
-                        tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
-                        km: parseFloat(kmRaw || 0),
-                        dplus: parseInt(document.getElementById('d_plus').value || 0),
-                        year: new Date(dataVal).getFullYear(),
-                        week: getWeekNumber(new Date(dataVal))
-                    };
-                }
-
-                db.push(entry);
-                localStorage.setItem(key, JSON.stringify(db));
-                
-                if(type === 'real') {
-                    const btn = document.getElementById('btn-salva-main');
-                    btn.innerText = "✓ Salvato";
-                    btn.style.background = "#30D158";
-                    setTimeout(() => { 
-                        btn.innerText = "Salva Sessione"; 
-                        btn.style.background = "var(--ios-blue)";
-                        document.getElementById('km_percorsi').value = "";
-                        document.getElementById('d_plus').value = "";
-                    }, 1500);
-                }
-            } catch(e) {
-                alert("Errore durante il salvataggio: " + e.message);
+            const dataVal = customData ? customData.data : document.getElementById('data_rif').value;
+            const key = type === 'real' ? DB_KEY : PLAN_DB_KEY;
+            let db = JSON.parse(localStorage.getItem(key) || "[]");
+            const idx = db.findIndex(r => r.data === dataVal);
+            if(type === 'real' && idx !== -1 && !confirm("Sovrascrivere?")) return;
+            if(idx !== -1) db.splice(idx, 1);
+            
+            let entry = customData || {
+                data: dataVal, pal: document.getElementById('palestra').value,
+                cor: document.getElementById('corsa').value,
+                tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
+                km: parseFloat(document.getElementById('km_percorsi').value.replace(',', '.') || 0),
+                dplus: parseInt(document.getElementById('d_plus').value || 0),
+                year: new Date(dataVal).getFullYear(), week: getWeekNumber(new Date(dataVal))
+            };
+            db.push(entry);
+            localStorage.setItem(key, JSON.stringify(db));
+            if(type === 'real') {
+                const btn = document.getElementById('btn-salva-main');
+                btn.innerText = "✓ Salvato"; btn.style.background = "#30D158";
+                setTimeout(() => { btn.innerText = "Salva Sessione"; btn.style.background = "var(--ios-blue)"; }, 1500);
             }
         }
 
@@ -218,42 +201,58 @@
             const container = document.getElementById('plan-container');
             container.innerHTML = "";
             const planDb = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
+            
             for(let wOffset = -1; wOffset <= 3; wOffset++) {
                 let d = new Date();
                 let dayNum = d.getDay() || 7;
                 d.setDate(d.getDate() - (dayNum - 1) + (wOffset * 7));
+                
                 let html = `<div class="section-title">${wOffset === 0 ? 'In corso' : (wOffset === -1 ? 'Scorsa' : 'Futura')} (W${getWeekNumber(d)})</div>`;
                 html += `<div class="table-container"><table><thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead><tbody>`;
+                
                 for(let i=0; i<7; i++) {
                     let c = new Date(d); c.setDate(d.getDate() + i);
                     const iso = c.toISOString().split('T')[0];
-                    const r = planDb.find(rec => rec.data === iso);
-                    html += `<tr class="${i >= 5 ? 'weekend-row' : ''}">
+                    const r = planDb.find(rec => rec.data === iso) || { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0 };
+                    const isToday = (iso === oggiIso);
+                    
+                    html += `<tr class="${i >= 5 ? 'weekend-row' : ''} ${isToday ? 'today-row' : ''}">
                         <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
-                        <td>${r?.pal==='SI'?'●':''}</td><td>${r?.tipo==='Lento'?'●':''}</td><td>${r?.tipo==='Reps'?'●':''}</td>
-                        <td class="col-stats">${r?.km||''}</td><td class="col-stats">${r?.dplus||''}</td>
-                    </tr>
-                    <tr class="${i >= 5 ? 'weekend-row' : ''}"><td colspan="6" style="padding: 2px 12px 8px 12px">
-                        <button class="btn-prog" onclick="pianificaGiorno('${iso}')">${r ? 'Modifica Piano' : '+ Programma'}</button>
-                    </td></tr>`;
+                        <td class="dot-cell" onclick="togglePlanCell('${iso}', 'pal')">${r.pal==='SI'?'●':''}</td>
+                        <td class="dot-cell" onclick="togglePlanCell('${iso}', 'Lento')">${r.tipo==='Lento'?'●':''}</td>
+                        <td class="dot-cell" onclick="togglePlanCell('${iso}', 'Reps')">${r.tipo==='Reps'?'●':''}</td>
+                        <td class="col-stats" onclick="editPlanValue('${iso}', 'km')">${r.km > 0 ? r.km.toFixed(1) : ''}</td>
+                        <td class="col-stats" onclick="editPlanValue('${iso}', 'dplus')">${r.dplus > 0 ? r.dplus : ''}</td>
+                    </tr>`;
                 }
                 html += `</tbody></table></div>`;
                 container.innerHTML += html;
             }
         }
 
-        function pianificaGiorno(iso) {
-            const pal = confirm("È prevista Palestra?") ? "SI" : "NO";
-            const cor = confirm("È prevista Corsa?") ? "SI" : "NO";
-            let tipo = "-", km = 0, dplus = 0;
-            if(cor === "SI") {
-                tipo = prompt("Tipo (Lento / Reps):", "Lento") || "Lento";
-                let kRaw = prompt("KM previsti:", "0") || "0";
-                km = parseFloat(kRaw.replace(',', '.'));
-                dplus = parseInt(prompt("D+ previsto:", "0") || "0");
-            }
-            salva('plan', { data: iso, pal, cor, tipo, km, dplus, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) });
+        function togglePlanCell(iso, field) {
+            let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
+            let idx = db.findIndex(r => r.data === iso);
+            let r = idx !== -1 ? db[idx] : { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) };
+            if(field === 'pal') r.pal = r.pal === 'SI' ? 'NO' : 'SI';
+            else if(field === 'Lento' || field === 'Reps') r.tipo = r.tipo === field ? '-' : field;
+            if(idx !== -1) db[idx] = r; else db.push(r);
+            localStorage.setItem(PLAN_DB_KEY, JSON.stringify(db));
             renderProgramma();
+        }
+
+        function editPlanValue(iso, field) {
+            let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
+            let idx = db.findIndex(r => r.data === iso);
+            let r = idx !== -1 ? db[idx] : { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) };
+            let val = prompt(field === 'km' ? "Inserisci KM:" : "Inserisci D+:");
+            if(val !== null) {
+                if(field === 'km') r.km = parseFloat(val.replace(',', '.') || 0);
+                else r.dplus = parseInt(val || 0);
+                if(idx !== -1) db[idx] = r; else db.push(r);
+                localStorage.setItem(PLAN_DB_KEY, JSON.stringify(db));
+                renderProgramma();
+            }
         }
 
         function aggiornaTutto() { renderSettimanale(); renderAnnuale(); }
@@ -272,7 +271,8 @@
                 const iso = c.toISOString().split('T')[0];
                 const r = db.find(rec => rec.data === iso);
                 if(r){ tk+=r.km; td+=r.dplus; }
-                tbody.innerHTML += `<tr class="${i >= 5 ? 'weekend-row' : ''}">
+                const isToday = (iso === oggiIso);
+                tbody.innerHTML += `<tr class="${i >= 5 ? 'weekend-row' : ''} ${isToday ? 'today-row' : ''}">
                     <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
                     <td>${r?.pal==='SI'?'●':''}</td><td>${r?.tipo==='Lento'?'●':''}</td><td>${r?.tipo==='Reps'?'●':''}</td>
                     <td class="col-stats">${r?.km ? r.km.toFixed(1) : ''}</td><td class="col-stats">${r?.dplus||''}</td>
@@ -296,17 +296,16 @@
 
         function exportToExcel() {
             const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
-            if(db.length === 0) { alert("Nessun dato da esportare."); return; }
+            if(db.length === 0) return;
             db.sort((a, b) => new Date(a.data) - new Date(b.data));
-            let csvContent = "Data,Palestra,Lento,Reps,KM,D+\n";
+            let csv = "Data,Palestra,Lento,Reps,KM,D+\n";
             db.forEach(r => {
-                const dataLeggibile = new Date(r.data).toLocaleDateString('it-IT');
-                csvContent += `${dataLeggibile},${r.pal},${r.tipo==="Lento"?"SI":"NO"},${r.tipo==="Reps"?"SI":"NO"},${r.km.toString().replace('.', ',')},${r.dplus}\n`;
+                csv += `${new Date(r.data).toLocaleDateString('it-IT')},${r.pal},${r.tipo==='Lento'?'SI':'NO'},${r.tipo==='Reps'?'SI':'NO'},${r.km.toString().replace('.', ',')},${r.dplus}\n`;
             });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([csv], { type: 'text/csv' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `workout_matteo_${new Date().getFullYear()}.csv`;
+            link.download = `workout_matteo.csv`;
             link.click();
         }
     </script>
