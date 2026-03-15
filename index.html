@@ -11,6 +11,7 @@
             --ios-blue: #0A84FF;
             --ios-bg: #000000;
             --ios-card: #1C1C1E;
+            --ios-card-alt: #262629;
             --ios-text: #FFFFFF;
             --ios-secondary-text: #8E8E93;
             --ios-border: #38383A;
@@ -41,10 +42,12 @@
 
         .table-container { background: var(--ios-card); border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--ios-border); }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 9px; text-transform: uppercase; }
-        td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; min-height: 45px; }
+        th { background: #2C2C2E; color: var(--ios-secondary-text); padding: 10px 5px; font-size: 9px; text-transform: uppercase; border-bottom: 1px solid var(--ios-border); }
         
-        /* EVIDENZIAZIONE OGGI */
+        /* EFFETTO ZEBRA E RIGHE */
+        td { padding: 12px 5px; border-bottom: 0.5px solid var(--ios-border); text-align: center; min-height: 45px; }
+        tr:nth-child(even) { background-color: var(--ios-card-alt); }
+        
         .today-row { 
             background-color: var(--ios-red-glow) !important;
             outline: 2px solid var(--ios-red);
@@ -53,12 +56,12 @@
             z-index: 1;
         }
 
-        .weekend-row { background-color: var(--ios-green-soft); }
+        .weekend-row { background-color: var(--ios-green-soft) !important; }
         .col-stats { background-color: var(--ios-yellow-soft); font-weight: 600; color: #FFD60A; min-width: 45px; }
         .col-left { text-align: left; padding-left: 12px; text-transform: lowercase; width: 35%; }
         .col-left::first-letter { text-transform: uppercase; }
         
-        .dot-cell { font-size: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; width: 12%; }
+        .dot-cell { font-size: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
         
         .card { background: var(--ios-card); border-radius: 12px; padding: 0 16px; margin-bottom: 20px; }
         .input-row { display: flex; justify-content: space-between; align-items: center; min-height: 50px; border-bottom: 0.5px solid var(--ios-border); }
@@ -95,7 +98,7 @@
             <div id="corsa-flow" class="hidden">
                 <div class="input-row"><label>Tipo</label><select id="tipo_corsa" onchange="toggleKM()"><option value="" selected disabled>Scegli...</option><option value="Lento">Lento</option><option value="Reps">Reps</option></select></div>
                 <div id="corsa-dati" class="hidden">
-                    <div class="input-row"><label>KM</label><input type="text" id="km_percorsi" inputmode="decimal" placeholder="0,00"></div>
+                    <div class="input-row"><label>KM</label><input type="number" id="km_percorsi" step="0.1" inputmode="decimal" placeholder="0.0"></div>
                     <div class="input-row"><label>D+ (m)</label><input type="number" id="d_plus" inputmode="numeric" placeholder="0"></div>
                 </div>
             </div>
@@ -120,16 +123,21 @@
             </table>
         </div>
         <div class="section-title">Riepilogo Annuale</div>
-        <div class="table-container" style="max-height: 200px; overflow-y: auto;">
-            <table><tbody id="year-summary-body"></tbody></table>
+        <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+            <table>
+                <thead><tr><th style="text-align:left;padding-left:12px;">Settimana</th><th class="col-stats">Tot KM</th><th class="col-stats">Tot D+</th></tr></thead>
+                <tbody id="year-summary-body"></tbody>
+            </table>
         </div>
         <button class="btn-export" onclick="exportToExcel()">Esporta per Excel (CSV)</button>
     </div>
 
     <script>
-        const DB_KEY = 'fitness_v19';
-        const PLAN_DB_KEY = 'plan_v19';
-        const oggiIso = new Date().toISOString().split('T')[0];
+        const DB_KEY = 'fitness_v20';
+        const PLAN_DB_KEY = 'plan_v20';
+        const oggi = new Date();
+        const oggiIso = oggi.toISOString().split('T')[0];
+        const weekCorrente = getWeekNumber(oggi);
 
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -142,15 +150,14 @@
             return dateObj.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
         }
 
-        const oggi = new Date();
         document.getElementById('data_rif').valueAsDate = oggi;
         document.getElementById('date-full').innerText = formatDataEstesa(oggi);
-        document.getElementById('week-num').innerText = "Settimana " + getWeekNumber(oggi);
+        document.getElementById('week-num').innerText = "Settimana " + weekCorrente;
 
         const yFilter = document.getElementById('year-filter');
         const wFilter = document.getElementById('week-filter');
         for(let i=0; i<3; i++) yFilter.innerHTML += `<option value="${oggi.getFullYear()-i}">${oggi.getFullYear()-i}</option>`;
-        for(let i=1; i<=53; i++) wFilter.innerHTML += `<option value="${i}" ${i===getWeekNumber(oggi)?'selected':''}>Settimana ${i}</option>`;
+        for(let i=1; i<=53; i++) wFilter.innerHTML += `<option value="${i}" ${i===weekCorrente?'selected':''}>Settimana ${i}</option>`;
 
         function toggleCorsa() {
             document.getElementById('corsa-flow').classList.toggle('hidden', document.getElementById('corsa').value === 'NO');
@@ -184,7 +191,7 @@
                 data: dataVal, pal: document.getElementById('palestra').value,
                 cor: document.getElementById('corsa').value,
                 tipo: document.getElementById('corsa').value === "SI" ? document.getElementById('tipo_corsa').value : "-",
-                km: parseFloat(document.getElementById('km_percorsi').value.replace(',', '.') || 0),
+                km: parseFloat(document.getElementById('km_percorsi').value || 0),
                 dplus: parseInt(document.getElementById('d_plus').value || 0),
                 year: new Date(dataVal).getFullYear(), week: getWeekNumber(new Date(dataVal))
             };
@@ -201,22 +208,17 @@
             const container = document.getElementById('plan-container');
             container.innerHTML = "";
             const planDb = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
-            
             for(let wOffset = -1; wOffset <= 3; wOffset++) {
                 let d = new Date();
                 let dayNum = d.getDay() || 7;
                 d.setDate(d.getDate() - (dayNum - 1) + (wOffset * 7));
-                
                 let html = `<div class="section-title">${wOffset === 0 ? 'In corso' : (wOffset === -1 ? 'Scorsa' : 'Futura')} (W${getWeekNumber(d)})</div>`;
                 html += `<div class="table-container"><table><thead><tr><th style="text-align:left;padding-left:12px;">Giorno</th><th>Pal</th><th>Len</th><th>Rep</th><th class="col-stats">KM</th><th class="col-stats">D+</th></tr></thead><tbody>`;
-                
                 for(let i=0; i<7; i++) {
                     let c = new Date(d); c.setDate(d.getDate() + i);
                     const iso = c.toISOString().split('T')[0];
                     const r = planDb.find(rec => rec.data === iso) || { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0 };
-                    const isToday = (iso === oggiIso);
-                    
-                    html += `<tr class="${i >= 5 ? 'weekend-row' : ''} ${isToday ? 'today-row' : ''}">
+                    html += `<tr class="${i >= 5 ? 'weekend-row' : ''} ${iso === oggiIso ? 'today-row' : ''}">
                         <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
                         <td class="dot-cell" onclick="togglePlanCell('${iso}', 'pal')">${r.pal==='SI'?'●':''}</td>
                         <td class="dot-cell" onclick="togglePlanCell('${iso}', 'Lento')">${r.tipo==='Lento'?'●':''}</td>
@@ -245,7 +247,7 @@
             let db = JSON.parse(localStorage.getItem(PLAN_DB_KEY) || "[]");
             let idx = db.findIndex(r => r.data === iso);
             let r = idx !== -1 ? db[idx] : { data: iso, pal: "NO", tipo: "-", km: 0, dplus: 0, year: new Date(iso).getFullYear(), week: getWeekNumber(new Date(iso)) };
-            let val = prompt(field === 'km' ? "Inserisci KM:" : "Inserisci D+:");
+            let val = prompt(field === 'km' ? "KM:" : "D+:");
             if(val !== null) {
                 if(field === 'km') r.km = parseFloat(val.replace(',', '.') || 0);
                 else r.dplus = parseInt(val || 0);
@@ -271,14 +273,13 @@
                 const iso = c.toISOString().split('T')[0];
                 const r = db.find(rec => rec.data === iso);
                 if(r){ tk+=r.km; td+=r.dplus; }
-                const isToday = (iso === oggiIso);
-                tbody.innerHTML += `<tr class="${i >= 5 ? 'weekend-row' : ''} ${isToday ? 'today-row' : ''}">
+                tbody.innerHTML += `<tr class="${i >= 5 ? 'weekend-row' : ''} ${iso === oggiIso ? 'today-row' : ''}">
                     <td class="col-left"><strong>${formatDataEstesa(c)}</strong></td>
                     <td>${r?.pal==='SI'?'●':''}</td><td>${r?.tipo==='Lento'?'●':''}</td><td>${r?.tipo==='Reps'?'●':''}</td>
                     <td class="col-stats">${r?.km ? r.km.toFixed(1) : ''}</td><td class="col-stats">${r?.dplus||''}</td>
                 </tr>`;
             }
-            document.getElementById('log-foot').innerHTML = `<tr class="row-total"><td class="col-left">TOTALI</td><td></td><td></td><td></td><td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td><td class="col-stats" style="background:#FFD60A; color:black;">${td}</td></tr>`;
+            document.getElementById('log-foot').innerHTML = `<tr class="row-total" style="background:#2C2C2E;"><td class="col-left">TOTALI</td><td></td><td></td><td></td><td class="col-stats" style="background:#FFD60A; color:black;">${tk.toFixed(1)}</td><td class="col-stats" style="background:#FFD60A; color:black;">${td}</td></tr>`;
         }
 
         function renderAnnuale() {
@@ -286,11 +287,19 @@
             const db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
             const tbody = document.getElementById('year-summary-body');
             tbody.innerHTML = "";
-            for (let w = 53; w >= 1; w--) {
+            const currYear = oggi.getFullYear();
+
+            for (let w = 1; w <= 53; w++) {
                 const data = db.filter(r => r.year === targetY && r.week === w);
                 const k = data.reduce((a, c) => a + c.km, 0);
                 const d = data.reduce((a, c) => a + c.dplus, 0);
-                if(k>0 || d>0) tbody.innerHTML += `<tr><td class="col-left">Settimana ${w}</td><td class="col-stats">${k.toFixed(1)} km</td><td class="col-stats">${d} m</td></tr>`;
+                const isThisWeek = (targetY === currYear && w === weekCorrente);
+                
+                tbody.innerHTML += `<tr class="${isThisWeek ? 'today-row' : ''}">
+                    <td class="col-left">Settimana ${w}</td>
+                    <td class="col-stats">${k > 0 ? k.toFixed(1) + ' km' : '-'}</td>
+                    <td class="col-stats">${d > 0 ? d + ' m' : '-'}</td>
+                </tr>`;
             }
         }
 
